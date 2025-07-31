@@ -6,4 +6,9 @@
     </style>
 
     <style name="Theme.Walking_hadang" parent="Base.Theme.Walking_hadang" />
+
+    <style name="ToolbarIconColor" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="colorControlNormal">#FFFFFF</item>
+    </style>
+
 </resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon="@android:drawable/ic_menu_share"
+        android:id="@+id/nav_item_call"
+        android:title="아이템1"/>
+    <item
+        android:icon="@android:drawable/ic_menu_help"
+        android:id="@+id/nav_item2"
+        android:title="아이템2"/>
+    <item
+        android:icon="@android:drawable/ic_menu_search"
+        android:id="@+id/nav_item3"
+        android:title="아이템3"/>
+    <item
+        android:icon="@android:drawable/ic_menu_add"
+        android:id="@+id/nav_item4"
+        android:title="아이템4"/>
+
+</menu>

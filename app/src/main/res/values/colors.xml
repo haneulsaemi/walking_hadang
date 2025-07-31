@@ -2,4 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="main_color">#206F3D</color> <!-- 툴바 색상 사용 -->
+    <color name="softSkyBlue">#D8F0FF</color> <!-- 부드러운 하늘색 배경 -->
+    <color name="darkText">#222222</color>     <!-- 로고용 진한 텍스트 -->
+    <color name="mediumGray">#666666</color>   <!-- 부제목용 중간 회색 -->
 </resources>
