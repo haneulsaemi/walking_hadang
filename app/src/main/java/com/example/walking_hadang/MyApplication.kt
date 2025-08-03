@@ -1,5 +1,8 @@
 package com.example.walking_hadang
 
+
+import androidx.emoji2.bundled.BundledEmojiCompatConfig
+import androidx.emoji2.text.EmojiCompat
 import androidx.multidex.MultiDexApplication
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -33,5 +36,9 @@ class MyApplication : MultiDexApplication() {
 
         auth = Firebase.auth
         db = FirebaseFirestore.getInstance()
+
+        // EmojiCompat 초기화 추가
+        val config = BundledEmojiCompatConfig(this)
+        EmojiCompat.init(config)
     }
 }

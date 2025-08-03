@@ -23,7 +23,11 @@ class MainActivity : AppCompatActivity() {
 
         binding.toolbar.setTitle("워킹하당")
         binding.toolbar.setTitleTextColor(Color.parseColor("#ffffff"))
+        val user = binding.toolbar.menu.findItem(R.id.menu_user)
 
+        if(MyApplication.checkAuth() || MyApplication.email != null ) {
+            user?.title = "${MyApplication.email} "
+        }
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.main_fragment_container, HomeFragment())
@@ -64,15 +68,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
-//            R.id.menu_alarm_settings ->{
-//                switchFragment(AlarmSettingsFragment())
-//                true
-//            }
-//            R.id.menu_setting ->{
-//                val intent = Intent(this, SettingActivity::class.java)
-//                startActivity(intent)
-//                true
-//            }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
