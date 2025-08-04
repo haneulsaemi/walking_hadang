@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class CourseRetrofit {
     companion object{
-        private const val BASE_URL = "https://api.data.go.kr/openapi/tn_pubr_public_stret_tursm_info_api/"
+        private const val BASE_URL = "http://api.data.go.kr/openapi/"
         val gson : Gson = GsonBuilder().setLenient().create()
         var courseApiService: CourseApiService
         val courseRetrofit: Retrofit

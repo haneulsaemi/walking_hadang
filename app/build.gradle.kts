@@ -1,3 +1,12 @@
+import java.util.Properties
+
+val secretsProps = Properties().apply{
+    val secretsFile = rootProject.file("secrets.properties")
+    if(secretsFile.exists()){
+        load(secretsFile.inputStream())
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +14,7 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
+
 
 android {
     namespace = "com.example.walking_hadang"
@@ -18,6 +28,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "WALK_API_KEY", "\"${secretsProps["WALK_API_KEY"]}\"")
     }
 
     buildTypes {

@@ -1,7 +1,6 @@
 package com.example.walking_hadang
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walking_hadang.databinding.ItemCourseCardBinding
