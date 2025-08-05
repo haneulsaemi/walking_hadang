@@ -1,21 +1,18 @@
-package com.example.walking_hadang
+package com.example.walking_hadang.ui
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.ui.AppBarConfiguration
+import com.example.walking_hadang.MyApplication
 import com.example.walking_hadang.databinding.ActivityLoginBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
-
 
 class LoginActivity : AppCompatActivity() {
 
@@ -31,7 +28,7 @@ class LoginActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
-        if(MyApplication.checkAuth()){
+        if(MyApplication.Companion.checkAuth()){
             changeVisibility("login")
         }else{
             changeVisibility("logout")
@@ -41,10 +38,10 @@ class LoginActivity : AppCompatActivity() {
             try{
                 val account = task.getResult(ApiException::class.java)
                 val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-                MyApplication.auth.signInWithCredential(credential)
+                MyApplication.Companion.auth.signInWithCredential(credential)
                     .addOnCompleteListener(this){task ->
-                        if(task.isSuccessful && MyApplication.checkAuth()){
-                            MyApplication.email = account.email
+                        if(task.isSuccessful && MyApplication.Companion.checkAuth()){
+                            MyApplication.Companion.email = account.email
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
                             finish()

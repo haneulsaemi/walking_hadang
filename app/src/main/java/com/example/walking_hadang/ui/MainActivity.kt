@@ -1,15 +1,14 @@
-package com.example.walking_hadang
+package com.example.walking_hadang.ui
 
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import com.example.walking_hadang.MyApplication
+import com.example.walking_hadang.R
 import com.example.walking_hadang.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -25,8 +24,8 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.setTitleTextColor(Color.parseColor("#ffffff"))
         val user = binding.toolbar.menu.findItem(R.id.menu_user)
 
-        if(MyApplication.checkAuth() || MyApplication.email != null ) {
-            user?.title = "${MyApplication.email} "
+        if(MyApplication.Companion.checkAuth() || MyApplication.Companion.email != null ) {
+            user?.title = "${MyApplication.Companion.email} "
         }
 
         supportFragmentManager.beginTransaction()
@@ -60,8 +59,8 @@ class MainActivity : AppCompatActivity() {
 
         return when (item.itemId) {
             R.id.menu_login -> {
-                MyApplication.auth.signOut()
-                MyApplication.email = null
+                MyApplication.Companion.auth.signOut()
+                MyApplication.Companion.email = null
 
                 val intent = Intent(this, LoginActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -77,12 +76,12 @@ class MainActivity : AppCompatActivity() {
         val item = menu?.findItem(R.id.menu_login)
         val user = menu?.findItem(R.id.menu_user)
 
-        val currentUser = MyApplication.auth.currentUser
+        val currentUser = MyApplication.Companion.auth.currentUser
         if (currentUser != null && currentUser.isEmailVerified) {
-            MyApplication.email = currentUser.email
+            MyApplication.Companion.email = currentUser.email
             item?.title = "Logout"
             user?.isVisible = true
-            user?.title = MyApplication.email
+            user?.title = MyApplication.Companion.email
         }
         else {
             item?.title = "Login"

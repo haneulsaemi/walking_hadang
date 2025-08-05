@@ -1,5 +1,6 @@
-package com.example.walking_hadang
+package com.example.walking_hadang.data
 
+import com.example.walking_hadang.data.CourseApiService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit

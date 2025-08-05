@@ -1,16 +1,19 @@
-package com.example.walking_hadang
+package com.example.walking_hadang.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
+import com.example.walking_hadang.R
 import com.example.walking_hadang.databinding.FragmentMapBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -20,7 +23,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -33,6 +35,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var googleMap: GoogleMap
+    private lateinit var startButton: Button
+    private lateinit var mapFragment: SupportMapFragment
+    private lateinit var recyclerView: RecyclerView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,6 +51,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        startButton = binding.btnStartWalking
+
+        startButton.setOnClickListener {
+            mapFragment.view?.visibility = View.VISIBLE
+            startButton.visibility = View.GONE
+            startTracking()
+        }
+        childFragmentManager.beginTransaction()
+            .replace(binding.courseFragmentCatainer.id, CourseListFragment())
+            .commit()
     }
 
     override fun onMapReady(map: GoogleMap) {
@@ -109,6 +125,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Toast.makeText(requireContext(), "위치 권한이 필요합니다.", Toast.LENGTH_SHORT)
             }
         }
+    }
+
+    private fun startTracking() {
+        // TODO: 위치 권한 요청 및 위치 업데이트 로직 구현
+        Toast.makeText(context, "산책을 시작합니다!", Toast.LENGTH_SHORT).show()
     }
 
 }

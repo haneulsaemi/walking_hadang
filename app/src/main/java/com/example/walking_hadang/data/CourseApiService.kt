@@ -1,4 +1,4 @@
-package com.example.walking_hadang
+package com.example.walking_hadang.data
 
 import retrofit2.Call
 import retrofit2.http.GET

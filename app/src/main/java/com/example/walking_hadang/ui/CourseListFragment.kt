@@ -1,14 +1,19 @@
-package com.example.walking_hadang
+package com.example.walking_hadang.ui
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.walking_hadang.BuildConfig
+import com.example.walking_hadang.adapter.CourseCardAdapter
+import com.example.walking_hadang.data.CourseData
+import com.example.walking_hadang.data.CourseResponse
+import com.example.walking_hadang.data.CourseRetrofit
 import com.example.walking_hadang.databinding.FragmentCourseListBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -29,9 +34,6 @@ class CourseListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val recyclerView = binding.courseRecyclerView
-
-
-
         recyclerView.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         courseAdapter = CourseCardAdapter(emptyList())
@@ -40,12 +42,12 @@ class CourseListFragment : Fragment() {
     }
 
     private fun fetchCourse(recyclerView: RecyclerView){
-        CourseRetrofit.courseApiService.getWalkingCourses(
+        CourseRetrofit.Companion.courseApiService.getWalkingCourses(
             serviceKey = BuildConfig.WALK_API_KEY,
             pageNo = 1,
             numOfRows = 100,
             type = "json"
-        ).enqueue(object : Callback<CourseResponse>{
+        ).enqueue(object : Callback<CourseResponse> {
 
             override fun onResponse(call: Call<CourseResponse?>, response: Response<CourseResponse?>) {
                 Log.d("Retrofit", "Response success: ${response.isSuccessful}")

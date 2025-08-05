@@ -1,4 +1,4 @@
-package com.example.walking_hadang
+package com.example.walking_hadang.data
 
 // JSON 데이터 구조를 확인한 뒤 해당 클래스 구조화 해야 함.
 data class CourseResponse(

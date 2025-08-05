@@ -1,8 +1,9 @@
-package com.example.walking_hadang
+package com.example.walking_hadang.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.walking_hadang.data.CourseData
 import com.example.walking_hadang.databinding.ItemCourseCardBinding
 
 class CourseCardAdapter(private val items: List<CourseData>) :
