@@ -1,5 +1,6 @@
 package com.example.walking_hadang.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,11 +11,16 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walking_hadang.BuildConfig
+import com.example.walking_hadang.adapter.AssetCourseCardAdapter
 import com.example.walking_hadang.adapter.CourseCardAdapter
+import com.example.walking_hadang.data.AssetCourseData
 import com.example.walking_hadang.data.CourseData
 import com.example.walking_hadang.data.CourseResponse
 import com.example.walking_hadang.data.CourseRetrofit
+import com.example.walking_hadang.data.CourseWrapper
 import com.example.walking_hadang.databinding.FragmentCourseListBinding
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,7 +28,7 @@ import retrofit2.Response
 class CourseListFragment : Fragment() {
     private var _binding: FragmentCourseListBinding? = null
     private val binding get() = _binding!!
-    private lateinit var courseAdapter: CourseCardAdapter
+    private lateinit var courseAdapter: AssetCourseCardAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,11 +42,28 @@ class CourseListFragment : Fragment() {
         val recyclerView = binding.courseRecyclerView
         recyclerView.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        courseAdapter = CourseCardAdapter(emptyList())
+        courseAdapter = AssetCourseCardAdapter(emptyList())
         recyclerView.adapter = courseAdapter
-        fetchCourse(recyclerView)
+        courseAdapter.updateData(loadCoursesFromAsset())
+//        fetchCourse(recyclerView)
     }
 
+    // 프로젝트 내부에 저장한 json파일로 산책 코스 불러오기
+    private fun loadCoursesFromAsset(): List<AssetCourseData> {
+        return try {
+            val inputStream = requireContext().assets.open("walking_courses.json")
+            val json = inputStream.bufferedReader().use { it.readText() }
+            Log.d("loadCoursesFromAsset", "jsonString loaded")
+            val gson = Gson()
+            val wrapper = gson.fromJson(json, CourseWrapper::class.java)
+            wrapper.records
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
+    // 공공데이터 api를 이용해 산책 코스 불러오기
     private fun fetchCourse(recyclerView: RecyclerView){
         CourseRetrofit.Companion.courseApiService.getWalkingCourses(
             serviceKey = BuildConfig.WALK_API_KEY,
@@ -57,8 +80,8 @@ class CourseListFragment : Fragment() {
                 if (response.isSuccessful) {
                     val body = response.body()
                     val courseList = body?.response?.body?.items?: emptyList<CourseData>()
-                    courseAdapter = CourseCardAdapter(courseList as List<CourseData>)
-                    recyclerView.adapter = courseAdapter
+//                    courseAdapter = CourseCardAdapter(courseList as List<CourseData>)
+//                    recyclerView.adapter = courseAdapter
                 } else {
                     Log.e("Retrofit", "응답 실패: ${response.code()}")
                 }

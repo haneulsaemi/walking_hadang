@@ -62,3 +62,6 @@ fastlane/test_outputs
 #api key
 
 secrets.properties
+
+# 내부 db json 파일
+assets/
