@@ -19,6 +19,7 @@ import com.example.walking_hadang.data.CourseResponse
 import com.example.walking_hadang.data.CourseRetrofit
 import com.example.walking_hadang.data.CourseWrapper
 import com.example.walking_hadang.databinding.FragmentCourseListBinding
+import com.example.walking_hadang.util.LocationUtil
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import retrofit2.Call
@@ -44,7 +45,8 @@ class CourseListFragment : Fragment() {
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         courseAdapter = AssetCourseCardAdapter(emptyList())
         recyclerView.adapter = courseAdapter
-        courseAdapter.updateData(loadCoursesFromAsset())
+        val tempList = LocationUtil.filterCoursesWithinRadius(loadCoursesFromAsset(), 37.5665, 126.9780)
+        courseAdapter.updateData(tempList)
 //        fetchCourse(recyclerView)
     }
 
