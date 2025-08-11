@@ -43,6 +43,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -109,6 +110,11 @@ dependencies {
     implementation("com.kakao.sdk:v2-cert:2.20.1") // 카카오톡 인증 서비스 API 모듈\\
 
     implementation("androidx.core:core-splashscreen:1.0.1")
+
+    //캘린더
+    implementation("com.kizitonwose.calendar:view:2.4.0")
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
 
 }
 

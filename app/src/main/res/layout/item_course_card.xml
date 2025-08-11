@@ -43,6 +43,19 @@
             android:layout_height="wrap_content"
             android:text="소요시간"
             android:textSize="14sp"
-            android:textColor="#777777" />
+            android:textColor="#295D56" />
+        <Button
+            android:id="@+id/btnGoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="찾아가기"
+            android:backgroundTint="#94BEC1"/>
+        <Button
+            android:id="@+id/btnDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="상세 정보"
+            android:backgroundTint="#529598"/>
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -2,8 +2,10 @@ package com.example.walking_hadang.ui
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -45,6 +47,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
 
+    private var selectMarker: Marker? = null
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var googleMap: GoogleMap
     private lateinit var startButton: Button
@@ -65,6 +69,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().findViewById<TextView>(R.id.toolbarTitle).text = "지도"
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -84,48 +91,80 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
 
-        var lat1: Double? = 0.0;
-        var lat2: Double? = 0.0;
-        var lng1: Double? = 0.0;
-        var lng2: Double? = 0.0;
-
         val courseList = loadCoursesFromAsset(requireContext())
-        val filteredList = LocationUtil.filterCoursesWithinRadius(courseList, 37.5665, 126.9780)
-        Log.d("MapFragment", "총 ${filteredList.size}개 로드됨")
-        filteredList.forEach {
-            Log.d("MapFragment", "이름: ${it.name}, 위치: (${it.latitude}, ${it.longitude})")
+        try {
+            getCurrentLocation(
+                onSuccess = { location ->
+                    Log.d("MapFragment", "현재 위치: ${location.latitude}, ${location.longitude}")
+                    val filteredList = LocationUtil.filterCoursesWithinRadius(
+                        courseList,
+                        35.573418,
+                        129.189629,
+                        radiusInKm = 20.0
+                    )
+                    Log.d("MapFragment", "필터링된 코스 개수: ${filteredList.size}")
+                    if (filteredList.isNotEmpty()) {
+                        addCourseMarkers(filteredList)
+                    } else {
+                        Toast.makeText(requireContext(), "추천 코스가 없습니다.", Toast.LENGTH_SHORT).show()
+                        // 필요하다면 전체 코스 표시
+                        // addCourseMarkers(courseList)  // 또는 아무 것도 안함
+                    }
+                    showCurrentLocation()
 
+                },
+                onFailure = {
+                    Toast.makeText(requireContext(), "현재 위치를 가져올 수 없습니다.", Toast.LENGTH_SHORT)
+                        .show()
+                    Log.e("MapFragment", "현재 위치를 가져올 수 없습니다.")
+                    // fallback: 전체 코스 표시
+                    addCourseMarkers(courseList)
+                }
+            )
+        }catch (e: Exception){
+            Log.e("MapFragment", "onMapReady에서 예외 발생: ${e.message}", e)
         }
-        lat1 = filteredList[0].latitude?.toDouble();
-        lat2 = filteredList[1].latitude?.toDouble();
-        lng1 = filteredList[0].longitude?.toDouble();
-        lng2 = filteredList[1].longitude?.toDouble();
-
-        val start = LatLng(lat1!!, lng1!!)
-        val end = LatLng(lat2!!, lng2!!)
-
-
-
-        addCourseMarkers(filteredList)  // 🔁 먼저 마커 추가
-
+        // 마커 클릭 이벤트
         googleMap.setOnMarkerClickListener { marker ->
             val course = markerCourseMap[marker]
             if(course != null){
+                Log.d("MapFragment", "마커 클릭: ${course.name}")
+                selectMarker = marker
+                //마커 클릭 시 카메라 위로 보정하는 코드
+                val currentZoom = googleMap.cameraPosition.zoom
+
+                val projection = googleMap.projection
+                val markerPoint = projection.toScreenLocation(marker.position)
+
+                // Y좌표를 위로 이동 (값이 클수록 위로 올라감)
+                val offsetY = 200  // px 단위, 필요에 따라 조절
+                markerPoint.y -= offsetY
+
+                // 다시 LatLng로 변환
+                val newLatLng = projection.fromScreenLocation(markerPoint)
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, currentZoom))
                 showFloatingCard(marker, course)
+            }else {
+                Log.e("MapFragment", "마커에 해당하는 코스가 없습니다.")
             }
             true
         }
+
+
+
+        // 지도 화면 이동 시 이벤트핸들러
+        googleMap.setOnCameraMoveListener {
+            selectMarker?.let{ marker ->
+                updateCardPosition(marker)
+            }
+        }
+
+
 
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
         ) {
             showCurrentLocation()  // 🔁 마커 추가 후 현재 위치 표시
-            googleMap.addPolyline(
-                PolylineOptions()
-                    .add(start,end)
-                    .width(5f)
-                    .color(0xFF0000FF.toInt())
-            )
         } else {
             ActivityCompat.requestPermissions(
                 requireActivity(),
@@ -135,16 +174,26 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun updateCardPosition(marker: Marker){
+        val projection = googleMap.projection
+        val screenPosition = projection.toScreenLocation(marker.position)
 
+        val cardView = binding.floatingCardContainer.getChildAt(0) ?: return
+
+        cardView.post {
+            cardView.x = screenPosition.x - cardView.width / 2f
+            cardView.y = screenPosition.y - cardView.height - 30f
+        }
+    }
 
     private fun showCurrentLocation() {
         getCurrentLocation(
             onSuccess = { location ->
-                val currentLatLng = LatLng(location.latitude, location.longitude)
+                val currentLatLng = LatLng(35.573418, 129.189629)
                 googleMap?.apply {
 //                                clear()
-                    addMarker(MarkerOptions().position(currentLatLng).title("현재 위치"))
-                    moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
+//                    addMarker(MarkerOptions().position(currentLatLng).title("현재 위치"))
+                    moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 13f))
                     try {
                         isMyLocationEnabled = true
                     }catch (e: SecurityException){
@@ -193,8 +242,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun showFloatingCard(marker: Marker, course: AssetCourseData){
-        val projection = googleMap.projection
-        val screenPosition = projection.toScreenLocation(marker.position)
+        Log.d("MapFragment", "FloatingCard 표시: ${course.name}, 좌표: ${course.latitude}, ${course.longitude}")
 
         val container = binding.floatingCardContainer
         container.removeAllViews()
@@ -205,15 +253,32 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val titleView = cardView.findViewById<TextView>(R.id.title)
         val lengthView = cardView.findViewById<TextView>(R.id.lengthInfo)
         val timeView = cardView.findViewById<TextView>(R.id.timeInfo)
+        val gotoBtn = cardView.findViewById<Button>(R.id.btnGoto)
+
+        val lat = course.latitude?.toDoubleOrNull()
+        val lng = course.longitude?.toDoubleOrNull()
 
         imageView.setImageResource(R.drawable.ic_road)
         titleView.text = course.name ?: "알 수 없음"
         lengthView.text = "총 길이: ${course.length ?: "?"} km"
         timeView.text = "예상 시간: ${course.time ?: "?"} 분"
 
+        //네비게이션 연동
+        gotoBtn.setOnClickListener {
+            if (lat != null && lng != null) {
+                startGoogleNavigation(requireContext(),  lat, lng)
+            }
+            true
+        }
+
+        cardView.isClickable = true
+        cardView.isFocusableInTouchMode = true
+        cardView.bringToFront()
 
         container.addView(cardView)
         cardView.post {
+            val projection = googleMap.projection
+            val screenPosition = projection.toScreenLocation(marker.position)
             // 화면 중심 기준 마커 위에 카드 위치 조정
             cardView.x = screenPosition.x - cardView.width / 2f
             cardView.y = screenPosition.y - cardView.height - 30f // 마커 위 살짝 띄우기
@@ -247,11 +312,24 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     if (location != null) {
                         onSuccess(location)
                     } else {
+                        Log.e("MapFragment", "fusedLocationClient.lastLocation 반환값이 null")
                         onFailure()
                     }
                 }
         } else {
+            Log.e("MapFragment", "위치 권한이 없습니다.")
             onFailure()
+        }
+    }
+
+    private fun startGoogleNavigation(context: Context, lat: Double, lng: Double){
+        val uri = Uri.parse("google.navigation:q=$lat,$lng&mode=w") // w: 걷기, d: 운전, r: 대중교통
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        intent.setPackage("com.google.android.apps.maps")
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        } else {
+            Toast.makeText(context, "구글 지도 앱이 설치되어 있지 않습니다.", Toast.LENGTH_SHORT).show()
         }
     }
 

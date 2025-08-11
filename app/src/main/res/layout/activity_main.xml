@@ -8,16 +8,13 @@
     android:orientation="vertical"
     tools:context=".ui.MainActivity">
 
-    <androidx.appcompat.widget.Toolbar
+
+    <include
         android:id="@+id/toolbar"
+        layout="@layout/toolbar_custom"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.5"
-        android:background="@color/white"
-        android:elevation="4dp"
-        android:paddingTop="30dp"
-        app:theme="@style/ToolbarIconColor"/>
-
+        android:layout_weight="1.2" />
 
     <!--    <com.github.mikephil.charting.charts.LineChart-->
     <!--        android:id="@+id/lineChart"-->
@@ -28,7 +25,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="8.5"
+        android:layout_weight="8.8"
         android:background="@color/white">
 
         <androidx.fragment.app.FragmentContainerView

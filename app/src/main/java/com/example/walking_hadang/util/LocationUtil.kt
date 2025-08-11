@@ -61,7 +61,7 @@ object LocationUtil {
                     latitude = lat
                     longitude = lon
                 }
-                val distance = currentLocation.distanceTo(courseLocation) / 100  // meters to km
+                val distance = currentLocation.distanceTo(courseLocation) / 500  // meters to km
                 distance <= radiusInKm
             } else {
                 false

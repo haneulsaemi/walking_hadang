@@ -1,6 +1,8 @@
 package com.example.walking_hadang.ui
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -47,6 +49,7 @@ class CourseListFragment : Fragment() {
         recyclerView.adapter = courseAdapter
         val tempList = LocationUtil.filterCoursesWithinRadius(loadCoursesFromAsset(), 37.5665, 126.9780)
         courseAdapter.updateData(tempList)
+
 //        fetchCourse(recyclerView)
     }
 
@@ -64,7 +67,6 @@ class CourseListFragment : Fragment() {
             emptyList()
         }
     }
-
     // 공공데이터 api를 이용해 산책 코스 불러오기
     private fun fetchCourse(recyclerView: RecyclerView){
         CourseRetrofit.Companion.courseApiService.getWalkingCourses(
@@ -95,4 +97,5 @@ class CourseListFragment : Fragment() {
             }
         })
     }
+
 }

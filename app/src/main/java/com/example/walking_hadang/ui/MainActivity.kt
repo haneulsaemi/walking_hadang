@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -20,10 +21,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        val toolbar = binding.toolbar.toolbar
         setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
+        setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+        toolbar.findViewById<TextView>(R.id.toolbarTitle).text = ""
 //        binding.toolbar.setTitle("워킹하당")
 //        binding.toolbar.setTitleTextColor(Color.parseColor("#ffffff"))
 //        val user = binding.toolbar.menu.findItem(R.id.menu_user)
