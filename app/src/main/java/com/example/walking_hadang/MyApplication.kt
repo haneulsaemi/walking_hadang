@@ -17,17 +17,8 @@ class MyApplication : MultiDexApplication() {
         var email:String? = null
         fun checkAuth() : Boolean{
             val currentUser = auth.currentUser
-
-            return currentUser?.let{
-                email = currentUser.email
-                if(currentUser.isEmailVerified){
-                    true
-                }else{
-                    false
-                }
-            }?:let {
-                false
-            }
+            email = currentUser?.email
+            return currentUser != null
         }
     }
 

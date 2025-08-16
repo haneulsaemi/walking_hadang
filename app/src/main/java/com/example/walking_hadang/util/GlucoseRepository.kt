@@ -1,5 +1,6 @@
 package com.example.walking_hadang.util
 
+import android.util.Log
 import com.example.walking_hadang.MyApplication
 import com.example.walking_hadang.data.GlucoseData
 import com.example.walking_hadang.data.GlucoseType
@@ -39,7 +40,7 @@ object GlucoseRepository {
             .document(uid())
             .collection("glucose")
             .document(dateKey)
-            .collection("entries")
+            .collection("glucoseEntries")
 
         val docRef = coll.document()
         val toSave = raw.copy(
@@ -55,9 +56,10 @@ object GlucoseRepository {
 
     suspend fun getDaily(date: Date = Date()): List<GlucoseData> {
         val key = dateKeyFrom(date)
+        Log.d("GluDbg", "read path users/${uid()}/glucose/${key}/glucoseEntries")
         return MyApplication.db.collection("users").document(uid())
             .collection("glucose").document(key)
-            .collection("entries")
+            .collection("glucoseEntries")
             .orderBy("recordedAt", Query.Direction.ASCENDING)
             .get().await()
             .toObjects(GlucoseData::class.java)
@@ -74,7 +76,7 @@ object GlucoseRepository {
         val startTs = Timestamp(start.time / 1000, 0)
         val endTs   = Timestamp(endExclusive.time / 1000, 0)
 
-        var q = MyApplication.db.collectionGroup("entries")
+        var q = MyApplication.db.collectionGroup("glucoseEntries")
             .whereEqualTo("userId", uid())
             .whereGreaterThanOrEqualTo("recordedAt", startTs)
             .whereLessThan("recordedAt", endTs)

@@ -17,5 +17,8 @@
     <style name="ToolbarIconColor" parent="ThemeOverlay.AppCompat.ActionBar">
         <item name="colorControlNormal">#FFFFFF</item>
     </style>
-
+    <style name="ShapeAppearanceOverlay.App.CornerFull" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

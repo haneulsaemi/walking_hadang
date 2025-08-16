@@ -16,8 +16,11 @@ import com.example.walking_hadang.data.GlucoseType
 import com.example.walking_hadang.data.MealType
 import com.example.walking_hadang.databinding.FragmentRecodeBloodSugarBinding
 import com.example.walking_hadang.util.GlucoseRepository
+import com.example.walking_hadang.util.chart.RoundedBarRenderer
 import com.github.mikephil.charting.charts.CombinedChart
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -28,16 +31,33 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.renderer.BarChartRenderer
+import com.github.mikephil.charting.renderer.CombinedChartRenderer
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class RecodeBloodSugarFragment : Fragment() {
+    private val COLOR_AXIS_BLUE = 0xFF2E8BEF.toInt()
+    private val COLOR_LABEL = 0xFF5A7DA0.toInt()
+    private val COLOR_GRID_SOFT = 0xFFE6EEF7.toInt()
+    private val COLOR_LEGEND = 0xFF666666.toInt()
+
+    private val COLOR_BAR = 0xFFFFE8C6.toInt()   // 베이지 톤 막대
+    private val COLOR_LINE = 0xFFFF6E6E.toInt()  // 연한 레드
+    private val COLOR_HIGHLIGHT = 0xFF2E8BEF.toInt()
+    private val COLOR_TARGET = 0xFFFFA64D.toInt() // 목표선(예: 125)
 
     private var _binding: FragmentRecodeBloodSugarBinding? = null
     private val binding get() = _binding!!
+    private var loadJob: Job? = null
+    private lateinit var chart: CombinedChart
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,16 +69,17 @@ class RecodeBloodSugarFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val swRange = binding.swRange
 
-        lifecycleScope.launch {
-//            val today = GlucoseRepository.getDaily(); //오늘 데이터
-//            renderDailyChart(today)
+        setupChart()
+        binding.tvSwitchLabel.text = if (swRange.isChecked) "주간" else "오늘"
+        triggerLoad(swRange.isChecked)
 
-            // 예) 공복 주간
-            val fasting = GlucoseRepository.getWeeklyByType(GlucoseType.FASTING)
-            Log.d("glucose", fasting.toString())
-            renderWeeklyCombined(fasting, "주간 공복 평균")
+        swRange.setOnCheckedChangeListener { _, isChecked ->
+            binding.tvSwitchLabel.text = if (isChecked) "주간" else "오늘"
+            triggerLoad(isChecked)
         }
+
 
         binding.btnAddGlucose.setOnClickListener {
             Log.d("GlucoseDebug", "버튼 클릭됨")
@@ -125,30 +146,120 @@ class RecodeBloodSugarFragment : Fragment() {
         }
     }
 
-    private fun tsToMillis(ts: Timestamp): Long =
-        ts.seconds * 1000L + ts.nanoseconds / 1_000_000L
+    private fun setupChart() {
+        chart = CombinedChart(requireContext()).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
 
-    private class DateValueFormatter(
-        private val pattern: String
-    ) : ValueFormatter() {
-        private val sdf = SimpleDateFormat(pattern, Locale.KOREA)
-        override fun getFormattedValue(value: Float): String {
-            return sdf.format(Date(value.toLong()))
+            description.isEnabled = false
+            setDrawGridBackground(false)
+            setBackgroundColor(Color.TRANSPARENT)
+            setExtraOffsets(8f, 8f, 8f, 8f)
+            isHighlightPerTapEnabled = true
+
+            // X 축
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                setDrawAxisLine(true)
+                setDrawGridLines(false)
+                axisLineColor = COLOR_AXIS_BLUE
+                textColor = COLOR_LABEL
+                textSize = 10f
+                granularity = 1f
+            }
+
+            // Y 축
+            axisRight.isEnabled = false
+            axisLeft.apply {
+                setDrawAxisLine(false)
+                setDrawGridLines(true)
+                gridColor = COLOR_GRID_SOFT
+                gridLineWidth = 1f
+                textColor = COLOR_LABEL
+                textSize = 10f
+                setLabelCount(5, false)
+            }
+
+            // 범례
+            legend.apply {
+                isEnabled = true
+                verticalAlignment = Legend.LegendVerticalAlignment.TOP
+                horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
+                orientation = Legend.LegendOrientation.HORIZONTAL
+                setDrawInside(false)
+                textSize = 10f
+                textColor = COLOR_LEGEND
+            }
+
+            drawOrder = arrayOf(
+                CombinedChart.DrawOrder.BAR,
+                CombinedChart.DrawOrder.LINE
+            )
+        }
+
+        // ★ CombinedChart에 둥근 막대 렌더러 장착
+        val combinedRenderer = object : CombinedChartRenderer(chart, chart.animator, chart.viewPortHandler) {
+            init {
+                // 기존 BarChartRenderer 교체
+                val rounded = RoundedBarRenderer(chart, chart.animator, chart.viewPortHandler, 18f)
+                mRenderers.removeAll { it is BarChartRenderer }
+                mRenderers.add(rounded)
+            }
+        }
+        chart.renderer = combinedRenderer
+        chart.setDrawBarShadow(false) // 필요하면 true
+
+        binding.chartContainer.removeAllViews()
+        binding.chartContainer.addView(chart)
+    }
+    private fun triggerLoad(isWeekly: Boolean) {
+        // 이전 로드 취소
+        Log.d("glucose","triggerLoad(isWeekly=$isWeekly) called. cancel prev=${loadJob != null}")
+        loadJob?.cancel()
+
+        loadJob = viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                if (isWeekly) {
+                    // 주간 데이터
+                    val fasting = withContext(Dispatchers.IO) {
+                        GlucoseRepository.getWeeklyByType(GlucoseType.FASTING)
+                    }
+                    Log.d("glucose", fasting.toString())
+                    // UI 업데이트는 메인 스레드
+                    Log.d("glucose" , "load weekly: done, count=${fasting.size}")
+                    val keyFmt = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
+                    val dayFmt = SimpleDateFormat("E", Locale.KOREA)
+
+                    renderWeeklyCombined(
+                        data = fasting,
+                        title = "주간 공복 평균",
+                        labelOf = { gd ->
+                            val d = keyFmt.parse(gd.dateKey)
+                            if (d != null) dayFmt.format(d) else ""
+                        },
+                        valueOf = { gd -> gd.value.toFloat() },
+                        showAvgLine = true
+                    )
+                } else {
+                    // 오늘 데이터
+                    val today = withContext(Dispatchers.IO) {
+                        GlucoseRepository.getDaily()
+                    }
+                    Log.d("glucose", "load daily: done, count=${today.size}")
+                    renderDailyCombined(today)
+                }
+            } catch (e: CancellationException) {
+                // 취소는 무시 (연타 시 정상)
+            } catch (e: Exception) {
+                // 에러 처리
+                Log.e("glucose", "load error", e)
+                // showErrorToast() 등
+            }
         }
     }
 
-    /** chartContainer에 LineChart를 새로 넣고 반환 */
-    private fun Fragment.makeLineChart(): LineChart {
-        val chart = LineChart(requireContext())
-
-        chart.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        binding.chartContainer.removeAllViews()
-        binding.chartContainer.addView(chart)
-        return chart
-    }
     private fun Fragment.makeCombinedChart(): CombinedChart {
         val chart = CombinedChart(requireContext())
         chart.layoutParams = ViewGroup.LayoutParams(
@@ -171,29 +282,26 @@ class RecodeBloodSugarFragment : Fragment() {
     }
 
     /** Y축 스케일을 혈당 범위에 맞게 조정 */
-    private fun scaleYAxis(chart: CombinedChart, entriesY: List<Float>) {
+    private fun scaleYAxis(entriesY: List<Float>) {
         if (entriesY.isEmpty()) return
         val minVal = entriesY.minOrNull() ?: 0f
         val maxVal = entriesY.maxOrNull() ?: 0f
         chart.axisLeft.apply {
-            axisMinimum = (minVal - 10f).coerceAtLeast(60f)
-            axisMaximum = (maxVal + 10f).coerceAtMost(250f)
+            axisMinimum = (minVal - 15f).coerceAtLeast(60f)
+            axisMaximum = (maxVal + 15f).coerceAtMost(250f)
         }
     }
 
     private fun renderDailyCombined(data: List<GlucoseData>) {
-        val chart = makeCombinedChart()
-        if (data.isEmpty()) { chart.clear(); return }
+        if (data.isEmpty()) { chart.clear(); chart.invalidate(); return }
 
-        // 시간순 정렬
         val sorted = data.sortedBy { it.recordedAt.seconds }
 
-        // X축 라벨(HH:mm) + entries(index 기반)
         val labels = ArrayList<String>()
         val barEntries = ArrayList<BarEntry>()
         val lineEntries = ArrayList<Entry>()
-
         val timeFmt = SimpleDateFormat("HH:mm", Locale.KOREA)
+
         sorted.forEachIndexed { idx, gd ->
             val ms = gd.recordedAt.seconds * 1000L + gd.recordedAt.nanoseconds / 1_000_000L
             labels += timeFmt.format(Date(ms))
@@ -202,91 +310,132 @@ class RecodeBloodSugarFragment : Fragment() {
             lineEntries += Entry(idx.toFloat(), v)
         }
 
-        val barSet = BarDataSet(barEntries, "혈당(막대)").apply {
-            color = Color.parseColor("#6EC6FF")
+        val barSet = BarDataSet(barEntries, "오늘(막대)").apply {
+            color = COLOR_BAR
             setDrawValues(false)
-            axisDependency = chart.axisLeft.axisDependency
+            highLightAlpha = 30
+            highLightColor = COLOR_HIGHLIGHT
         }
-        val lineSet = LineDataSet(lineEntries, "혈당(라인)").apply {
-            color = Color.parseColor("#FF5252")
-            lineWidth = 2f
+        val barData = BarData(barSet).apply { barWidth = 0.45f }
+
+        val lineSet = LineDataSet(lineEntries, "추세(라인)").apply {
+            color = COLOR_LINE
+            lineWidth = 2.2f
             setDrawCircles(true)
             circleRadius = 3f
+            setDrawCircleHole(false)
             setDrawValues(false)
             mode = LineDataSet.Mode.CUBIC_BEZIER
-            axisDependency = chart.axisLeft.axisDependency
+            highLightColor = COLOR_HIGHLIGHT
         }
+        val lineData = LineData(lineSet)
 
-        val combined = CombinedData().apply {
-            setData(BarData(barSet).apply { barWidth = 0.45f })
-            setData(LineData(lineSet))
+        chart.data = CombinedData().apply {
+            setData(barData)
+            setData(lineData)
         }
-        chart.data = combined
 
         chart.xAxis.apply {
-            position = XAxis.XAxisPosition.BOTTOM
-            granularity = 1f
             valueFormatter = IndexAxisValueFormatter(labels)
-            setLabelCount(labels.size.coerceAtMost(6), false) // 너무 많으면 자동 간격
+            setLabelCount(labels.size.coerceAtMost(6), false)
+            yOffset = 6f
         }
 
-        scaleYAxis(chart, lineEntries.map { it.y })
+        // 목표선(원하면 값 바꿔 쓰기)
+        chart.axisLeft.apply {
+            removeAllLimitLines()
+            val target = LimitLine(125f, "").apply {
+                lineColor = COLOR_TARGET
+                lineWidth = 1f
+                enableDashedLine(6f, 6f, 0f)
+            }
+            addLimitLine(target)
+            setDrawLimitLinesBehindData(true)
+        }
+
+        scaleYAxis(lineEntries.map { it.y })
+        chart.animateY(600)
+        chart.notifyDataSetChanged()
         chart.invalidate()
     }
 
-    private fun renderWeeklyCombined(weekly: List<GlucoseData>, label: String) {
-        val chart = makeCombinedChart()
-        if (weekly.isEmpty()) { chart.clear(); return }
+    private fun <T> renderWeeklyCombined(
+        data: List<T>,
+        title: String,
+        labelOf: (T) -> String,
+        valueOf: (T) -> Float,
+        showAvgLine: Boolean = false
+    ) {
+        if (data.isEmpty()) { chart.clear(); chart.invalidate(); return }
 
-        // yyyy-MM-dd로 그룹 → 평균, 라벨은 MM/dd
-        val sdfKey = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
-        val sdfShow = SimpleDateFormat("MM/dd", Locale.KOREA)
-
-        val grouped = weekly.groupBy {
-            val ms = it.recordedAt.seconds * 1000L + it.recordedAt.nanoseconds / 1_000_000L
-            sdfKey.format(Date(ms))
-        }.toSortedMap()
-
+        // X 라벨 & 막대 엔트리 구성
         val labels = ArrayList<String>()
         val barEntries = ArrayList<BarEntry>()
-        val lineEntries = ArrayList<Entry>()
 
-        grouped.entries.forEachIndexed { idx, (dayKey, items) ->
-            val avg = items.map { it.value }.average().toFloat()
-            labels += sdfShow.format(sdfKey.parse(dayKey)!!)
-            barEntries += BarEntry(idx.toFloat(), avg)
-            lineEntries += Entry(idx.toFloat(), avg)
+        data.forEachIndexed { idx, item ->
+            labels += labelOf(item)
+            barEntries += BarEntry(idx.toFloat(), valueOf(item))
         }
 
-        val barSet = BarDataSet(barEntries, "$label(막대)").apply {
-            color = Color.parseColor("#6EC6FF")
+        val barSet = BarDataSet(barEntries, title).apply {
+            color = COLOR_BAR
             setDrawValues(false)
-            axisDependency = chart.axisLeft.axisDependency
+            highLightAlpha = 30
+            highLightColor = COLOR_HIGHLIGHT
         }
-        val lineSet = LineDataSet(lineEntries, "$label(라인)").apply {
-            color = Color.parseColor("#FF5252")
-            lineWidth = 1f
-            setDrawCircles(true)
-            circleRadius = 3f
-            setDrawValues(false)
-            mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-            axisDependency = chart.axisLeft.axisDependency
+        val barData = BarData(barSet).apply { barWidth = 0.55f }
+
+        // (옵션) 주간 평균 라인
+        val combined = CombinedData().apply { setData(barData) }
+
+        if (showAvgLine) {
+            val avg = barEntries.map { it.y }.average().toFloat()
+            val lineEntries = labels.indices.map { idx -> Entry(idx.toFloat(), avg) }
+            val lineSet = LineDataSet(lineEntries, "주간 평균").apply {
+                color = COLOR_LINE
+                lineWidth = 2f
+                setDrawCircles(false)
+                setDrawValues(false)
+                mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+                highLightColor = COLOR_HIGHLIGHT
+            }
+            combined.setData(LineData(lineSet))
         }
 
-        val combined = CombinedData().apply {
-            setData(BarData(barSet).apply { barWidth = 0.45f })
-            setData(LineData(lineSet))
-        }
         chart.data = combined
 
         chart.xAxis.apply {
-            position = XAxis.XAxisPosition.BOTTOM
-            granularity = 1f
             valueFormatter = IndexAxisValueFormatter(labels)
-            setLabelCount(labels.size.coerceAtMost(7), false)
+            setLabelCount(labels.size, true)
+            yOffset = 6f
+            // 라벨이 '월 화 수 ...' 같이 짧다면 회전 불필요, 길면 아래처럼:
+            // labelRotationAngle = -15f
         }
 
-        scaleYAxis(chart, lineEntries.map { it.y })
+        // 목표선(공복/식후에 맞춰 조정)
+        chart.axisLeft.apply {
+            removeAllLimitLines()
+            val target = LimitLine(125f, "").apply {
+                lineColor = COLOR_TARGET
+                lineWidth = 1f
+                enableDashedLine(6f, 6f, 0f)
+            }
+            addLimitLine(target)
+            setDrawLimitLinesBehindData(true)
+        }
+
+        // 스케일
+        scaleYAxis(barEntries.map { it.y })
+
+        chart.animateY(600)
+        chart.notifyDataSetChanged()
         chart.invalidate()
+    }
+
+    override fun onDestroyView() {
+        loadJob?.cancel()
+        loadJob = null
+        _binding = null
+        super.onDestroyView()
     }
 }

@@ -20,9 +20,6 @@ class HomeFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        childFragmentManager.beginTransaction()
-            .replace(binding.courseFragmentCatainer.id, CourseListFragment())
-            .commit()
     }
 
     override fun onDestroyView() {

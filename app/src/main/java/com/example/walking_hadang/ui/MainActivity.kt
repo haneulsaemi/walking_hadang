@@ -14,10 +14,26 @@ import androidx.fragment.app.Fragment
 import com.example.walking_hadang.MyApplication
 import com.example.walking_hadang.R
 import com.example.walking_hadang.databinding.ActivityMainBinding
+import com.example.walking_hadang.ui.account.ProfileActivity
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var binding : ActivityMainBinding
+
+    override fun onStart() {
+        super.onStart()
+        if (!MyApplication.checkAuth()) {
+            startActivity(
+                Intent(this, LoginActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                }
+            )
+            finish()
+            return
+        }
+        invalidateOptionsMenu()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -27,13 +43,7 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         toolbar.findViewById<TextView>(R.id.toolbarTitle).text = ""
-//        binding.toolbar.setTitle("워킹하당")
-//        binding.toolbar.setTitleTextColor(Color.parseColor("#ffffff"))
-//        val user = binding.toolbar.menu.findItem(R.id.menu_user)
-//
-//        if(MyApplication.Companion.checkAuth() || MyApplication.Companion.email != null ) {
-//            user?.title = "${MyApplication.Companion.email} "
-//        }
+
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.main_fragment_container, HomeFragment())
@@ -65,24 +75,14 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId){
             R.id.menu_profile ->{
-                showProfilePopup()
+//                showProfilePopup()
+                val intent = Intent(this, ProfileActivity::class.java)
+                startActivity(intent)
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
-//        return when (item.itemId) {
-//            R.id.menu_login -> {
-//                MyApplication.Companion.auth.signOut()
-//                MyApplication.Companion.email = null
-//
-//                val intent = Intent(this, LoginActivity::class.java)
-////                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//                startActivity(intent)
-//                true
-//            }
-//
-//            else -> super.onOptionsItemSelected(item)
-//        }
+
     }
 
     private fun showProfilePopup() {
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         popup.menuInflater.inflate(R.menu.menu_profile_popup, popup.menu)
 
         val currentUser = MyApplication.auth.currentUser
-        val isLoggedIn = currentUser != null && currentUser.isEmailVerified
+        val isLoggedIn = currentUser != null
 
         popup.menu.findItem(R.id.menu_login).isVisible = !isLoggedIn
         popup.menu.findItem(R.id.menu_logout).isVisible = isLoggedIn
@@ -106,6 +106,14 @@ class MainActivity : AppCompatActivity() {
                 R.id.menu_logout -> {
                     MyApplication.auth.signOut()
                     Toast.makeText(this, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show()
+                    if (!MyApplication.checkAuth()) {
+                        startActivity(
+                            Intent(this, LoginActivity::class.java).apply {
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                            }
+                        )
+                        finish()
+                    }
                     invalidateOptionsMenu() // 메뉴 갱신
                     true
                 }
@@ -116,28 +124,7 @@ class MainActivity : AppCompatActivity() {
         popup.show()
     }
 
-//    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-//        val item = menu?.findItem(R.id.menu_login)
-//        val user = menu?.findItem(R.id.menu_user)
-//
-//        val currentUser = MyApplication.Companion.auth.currentUser
-//        if (currentUser != null && currentUser.isEmailVerified) {
-//            MyApplication.Companion.email = currentUser.email
-//            item?.title = "Logout"
-//            user?.isVisible = true
-//            user?.title = MyApplication.Companion.email
-//        }
-//        else {
-//            item?.title = "Login"
-//            user?.isVisible = false
-//        }
-//        return super.onPrepareOptionsMenu(menu)
-//    }
 
-    override fun onStart() {
-        super.onStart()
-        invalidateOptionsMenu()
-    }
 
     override fun onResume() {
         super.onResume()

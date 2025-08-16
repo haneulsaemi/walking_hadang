@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.walking_hadang.R
+import com.example.walking_hadang.adapter.DayUi
 import com.example.walking_hadang.databinding.FragmentRecodingBinding
 import com.example.walking_hadang.ui.recoding.RecodeBloodSugarFragment
 import com.example.walking_hadang.ui.recoding.RecodeMealFragment
@@ -45,6 +46,11 @@ class RecodingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.tvSelectedDate.text = "%d. %d. %d (%s)".format(
+            selectedDate.year, selectedDate.monthValue, selectedDate.dayOfMonth,
+            selectedDate.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.KOREA)
+
+        )
         requireActivity().findViewById<TextView>(R.id.toolbarTitle).text = "기록"
         setupWeekCalendar()
         val pager = binding.sectionPager
@@ -90,13 +96,14 @@ class RecodingFragment : Fragment() {
                 val isSelected = (date == selectedDate)
                 val isToday = (date == LocalDate.now())
                 container.tvDay.background =
-                    if (isSelected || isToday)
+                    if (isSelected)
                         ContextCompat.getDrawable(requireContext(), R.drawable.bg_day_selected)
+                    else if(isToday)
+                        ContextCompat.getDrawable(requireContext(), R.drawable.bg_today)
                     else null
 
                 // 클릭: 선택 변경 & 해당 두 날짜만 갱신
                 container.view.setOnClickListener {
-                    Log.d("CALENDAR", "캘린더 뷰는 잇어요")
                     val old = selectedDate
                     val new = date
                     if (old != new) {
@@ -104,6 +111,11 @@ class RecodingFragment : Fragment() {
                         calendar.notifyDateChanged(old)
                         calendar.notifyDateChanged(new)
                         // 필요 시 상단 날짜/그래프 갱신
+                        // 선택 날짜 텍스트 갱신 등
+                        binding.tvSelectedDate.text = "%d. %d. %d (%s)".format(
+                            selectedDate.year, selectedDate.monthValue, selectedDate.dayOfMonth,
+                            selectedDate.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.KOREA)
+                        )
                         onDateSelected(new)
                     }
                 }
@@ -118,6 +130,15 @@ class RecodingFragment : Fragment() {
         )
         calendar.post { calendar.scrollToDate(selectedDate) }
     }
+
+    private fun buildWindow(center: LocalDate): List<DayUi> {
+        val start = center.minusDays(3)
+        return (0..6).map { offset ->
+            val d = start.plusDays(offset.toLong())
+            DayUi(d, d == LocalDate.now(), d == center)
+        }
+    }
+
     private fun onDateSelected(date: LocalDate) {
         // 예: 일별 혈당 데이터 조회 후 차트 갱신
         lifecycleScope.launch {

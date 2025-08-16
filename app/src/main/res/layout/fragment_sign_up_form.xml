@@ -19,9 +19,11 @@
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:backgroundTint="@color/main_color"
             android:paddingLeft="20dp"
             android:src="@drawable/ic_back"
+            android:contentDescription="뒤로가기"
             app:tint="@color/white" />
 
     </LinearLayout>
@@ -40,7 +42,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="48dp"/>
-
+        <EditText
+            android:id="@+id/edit_text_pass"
+            android:hint="비밀번호"
+            android:layout_marginTop="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:minHeight="48dp"/>
         <EditText
             android:id="@+id/edit_text_nick"
             android:hint="닉네임"
@@ -65,10 +74,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <RadioButton
+                android:id="@+id/radioFemale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="여성" />
             <RadioButton
+                android:id="@+id/radioMale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="남성"

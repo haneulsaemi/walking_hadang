@@ -99,7 +99,8 @@ dependencies {
     // Maps SDK for Android
     implementation("com.google.android.gms:play-services-maps:19.0.0")
 
-    implementation("com.google.android.gms:play-services-location:17.0.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.maps.android:android-maps-utils:3.8.2")
 
     implementation("com.kakao.sdk:v2-all:2.20.1") // 전체 모듈 설치, 2.11.0 버전부터 지원
     implementation("com.kakao.sdk:v2-user:2.20.1") // 카카오 로그인 API 모듈
@@ -111,11 +112,18 @@ dependencies {
 
     implementation("androidx.core:core-splashscreen:1.0.1")
 
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
     //캘린더
     implementation("com.kizitonwose.calendar:view:2.4.0")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
 
+    //코루틴
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+
+    //gridlayout
+    implementation("androidx.gridlayout:gridlayout:1.0.0")
 }
 
 secrets{

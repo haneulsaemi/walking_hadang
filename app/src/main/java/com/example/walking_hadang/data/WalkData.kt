@@ -5,6 +5,8 @@ import com.google.firebase.Timestamp
 
 data class WalkData(
     val id: String? = null,
+    val userId: String = "",
+    val dateKey: String = "",
     val startedAt: Timestamp = Timestamp.now(),
     val endedAt: Timestamp? = null,
     val durationSec: Int = 0,

@@ -6,4 +6,18 @@
     <color name="softSkyBlue">#D8F0FF</color> <!-- 부드러운 하늘색 배경 -->
     <color name="darkText">#222222</color>     <!-- 로고용 진한 텍스트 -->
     <color name="mediumGray">#666666</color>   <!-- 부제목용 중간 회색 -->
+    <color name="chip_checked">#FFCDD2</color> <!-- 선택된 칩 배경색 -->
+    <color name="chip_unchecked">#E0E0E0</color> <!-- 선택되지 않은 칩 배경색 -->
+    <color name="chip_text_checked">#000000</color> <!-- 선택된 칩 텍스트 색상 -->
+    <color name="chip_text_unchecked">#666666</color> <!-- 선택되지 않은 칩 텍스트 색상 -->
+    <color name="sky_blue">#2E8BEF</color>
+    <color name="chart_header_yellow">#F5A623</color>
+    <color name="app_bg">#FFFCFC</color>
+    <color name="card_mint">#DAF3EF</color>
+    <color name="card_mint_light">#EEF9F7</color>
+    <color name="ink_primary">#0F3D3E</color>
+    <color name="ink_secondary">#5E7778</color>
+    <color name="chip_bg">#CCFFFFFF</color>
+    <color name="tint_circle">#2C6E49</color>
+    <color name="ink_on_tint">#FFFFFF</color>
 </resources>

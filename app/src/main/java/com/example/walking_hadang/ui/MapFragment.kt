@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -22,10 +24,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.walking_hadang.R
 import com.example.walking_hadang.data.AssetCourseData
 import com.example.walking_hadang.data.CourseWrapper
+import com.example.walking_hadang.data.WalkData
 import com.example.walking_hadang.databinding.FragmentMapBinding
 import com.example.walking_hadang.util.LocationUtil
+import com.example.walking_hadang.util.WalkRepository
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -36,7 +44,12 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.firebase.Timestamp
 import com.google.gson.Gson
+import com.google.maps.android.PolyUtil
+import java.util.Date
+import java.util.Locale
+import kotlin.math.roundToInt
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -55,15 +68,39 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mapFragment: SupportMapFragment
     private lateinit var recyclerView: RecyclerView
 
+    private var runningPolyline: Polyline? = null
+    private var runningPath =  mutableListOf<LatLng>()
+    private var isRunning: Boolean = false
+    private var walkStartMillis: Long? = null
+
+    private var locationRequest: com.google.android.gms.location.LocationRequest? = null
+    private lateinit var locationcallback: LocationCallback
+
     //지도 마커와 카드뷰 연결
     private val markerCourseMap = mutableMapOf<Marker, AssetCourseData>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        locationcallback = object : com.google.android.gms.location.LocationCallback() {
+            override fun onLocationResult(result: com.google.android.gms.location.LocationResult) {
+                val map = googleMap ?: return
+                for(loc in result!!.locations){
+                    val p = LatLng(loc.latitude, loc.longitude)
+                    runningPath.add(p)
+
+                    runningPolyline?.points = runningPath
+
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(p, 16f))
+                }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMapBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -79,9 +116,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         startButton = binding.btnStartWalking
 
         startButton.setOnClickListener {
-            mapFragment.view?.visibility = View.VISIBLE
-            startButton.visibility = View.GONE
-            startTracking()
+            if(isRunning){
+//                mapFragment.view?.visibility = View.INVISIBLE
+//                startButton.visibility = View.VISIBLE
+                saveDummyWalk()
+                startButton.text = "산책 시작하기"
+            }else{
+                mapFragment.view?.visibility = View.VISIBLE
+//                startButton.visibility = View.GONE
+                startButton.text = "산책 종료하기"
+                startTracking()
+            }
+            isRunning = !isRunning
+
+
         }
 //        childFragmentManager.beginTransaction()
 //            .replace(binding.courseFragmentCatainer.id, CourseListFragment())
@@ -90,6 +138,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
+        googleMap?.uiSettings?.isMyLocationButtonEnabled = true
+
 
         val courseList = loadCoursesFromAsset(requireContext())
         try {
@@ -150,16 +200,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             true
         }
 
-
-
         // 지도 화면 이동 시 이벤트핸들러
         googleMap.setOnCameraMoveListener {
             selectMarker?.let{ marker ->
                 updateCardPosition(marker)
             }
         }
-
-
 
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
@@ -339,12 +385,161 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             onSuccess = {location ->
                 val userLat = location.latitude
                 val userLng = location.longitude
+                walkStartMillis = System.currentTimeMillis()
+
+                runningPath.clear()
+                // 기존 폴리라인 제거 후 새로 생성
+                runningPolyline?.remove()
+                val opts = PolylineOptions()
+                    .color(ContextCompat.getColor(requireContext(), R.color.softSkyBlue))
+                    .width(7f)
+                runningPolyline = googleMap?.addPolyline(opts)
+
+                // 위치 요청(간격/정확도 조절 가능)
+                // 최신 API 권장: LocationRequest.Builder
+                locationRequest = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    com.google.android.gms.location.LocationRequest.Builder(
+                        com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, 2000L
+                    ).setMinUpdateIntervalMillis(1000L).build()
+                } else {
+                    @Suppress("DEPRECATION")
+                    com.google.android.gms.location.LocationRequest.create().apply {
+                        interval = 2000L
+                        fastestInterval = 1000L
+                        priority = com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
+                    }
+                }
+
+//                fusedLocationClient.requestLocationUpdates()
+                Toast.makeText(context, "산책을 시작합니다!", Toast.LENGTH_SHORT).show()
+
             },
             onFailure = {
                 Toast.makeText(requireContext(), "위치 정보를 사용할 수 없습니다", Toast.LENGTH_SHORT).show()
             }
         )
-        Toast.makeText(context, "산책을 시작합니다!", Toast.LENGTH_SHORT).show()
+    }
+
+    // 종료하기: 위치업데이트 중지 + (선택) 거리/시간 계산
+    private fun onStopTracking() {
+        fusedLocationClient.removeLocationUpdates(locationcallback)
+
+        val distanceMeters  = computeTotalDistanceMeters(runningPath)
+        val distanceM = distanceMeters.roundToInt()
+        val endedAt = Timestamp.now()
+        val startedAtTs = walkStartMillis?.let { Timestamp(Date(it)) } ?: Timestamp.now()
+        val durationSec = walkStartMillis?.let { ((System.currentTimeMillis() - it) / 1000L).toInt() } ?: 0
+
+        // 시작/종료 좌표
+        val start = runningPath.firstOrNull()
+        val end = runningPath.lastOrNull()
+
+        // 경로 polyline 인코딩 (nullable 방지용으로 그대로 List<LatLng> 사용)
+        val routePolyline = if (runningPath.size >= 2) {
+            PolyUtil.encode(runningPath)
+        } else {
+            null
+        }
+
+        val stepsCount = 0
+
+
+        val walk = WalkData(
+            startedAt = startedAtTs,
+            endedAt = endedAt,
+            durationSec = durationSec,
+            distanceM = distanceM,
+            steps = stepsCount,
+            startLat = start?.latitude,
+            startLng = start?.longitude,
+            endLat = end?.latitude,
+            endLng = end?.longitude,
+            routePolyline = routePolyline,
+            note = null // 필요 시 UI에서 입력받은 메모 문자열
+        )
+
+        WalkRepository.addWalkEntry(walk,
+            onSuccess = { id ->
+                val kmText = String.format(Locale.getDefault(), "%.2f km", distanceMeters / 1000.0)
+                Toast.makeText(requireContext(), "트래킹 종료 - 총 거리: $kmText", Toast.LENGTH_LONG).show()
+                Log.d("WalkDebug", "저장 성공: $id")
+                end?.let {
+                    googleMap?.addMarker(
+                        com.google.android.gms.maps.model.MarkerOptions()
+                            .position(it)
+                            .title("종료 지점")
+                    )
+                }
+            },
+            onError = { e ->
+                Log.e("WalkDebug", "저장 실패", e)
+            }
+        )
+
+
+
+        // 마지막 지점 마커
+        if (runningPath.isNotEmpty()) {
+            val last = runningPath.last()
+            googleMap?.addMarker(MarkerOptions().position(last).title("종료 지점"))
+        }
+    }
+
+    // 두 점 사이 거리 합산
+    private fun computeTotalDistanceMeters(points: List<LatLng>): Double {
+        if (points.size < 2) return 0.0
+        val results = FloatArray(1)
+        var sum = 0.0
+        for (i in 1 until points.size) {
+            val a = points[i - 1]
+            val b = points[i]
+            Location.distanceBetween(a.latitude, a.longitude, b.latitude, b.longitude, results)
+            sum += results[0]
+        }
+        return sum
+    }
+
+    fun saveDummyWalk() {
+
+        // 예시 경로 (단순히 3개 좌표 연결)
+        val fakePath = listOf(
+            LatLng(37.5830, 127.0005), // 혜화역
+            LatLng(37.5815, 127.0025), // 마로니에공원
+            LatLng(37.5790, 127.0040)  // 창경궁 입구
+        )
+
+        // 경로 polyline 인코딩
+        val encodedPolyline = PolyUtil.encode(fakePath)
+
+        // 시작 & 종료 시간 (1시간 차이)
+        val startTime = Timestamp(Date(System.currentTimeMillis() - 3600_000))
+        val endTime = Timestamp.now()
+
+        // WalkData 형식 맞춰서 생성
+        val dummyWalk = WalkData(
+            id = null,
+            startedAt = Timestamp(Date(System.currentTimeMillis() - 2700_000)), // 45분 전
+            endedAt = Timestamp(Date(System.currentTimeMillis() - 900_000)),    // 15분 전
+            durationSec = 1800,
+            distanceM = 1200,
+            steps = 1800,
+            startLat = fakePath.first().latitude,
+            startLng = fakePath.first().longitude,
+            endLat = fakePath.last().latitude,
+            endLng = fakePath.last().longitude,
+            routePolyline = encodedPolyline,
+            note = "대학로 저녁 산책"
+        )
+
+        // Firestore에 저장
+        WalkRepository.addWalkEntry(dummyWalk,
+            onSuccess = { id ->
+                Log.e("WalkDebug","임의 데이터 저장 성공: ${id}")
+            },
+            onError = { e ->
+                Log.e("WalkDebug", "임의 데이터 저장 실패", e)
+            }
+        )
     }
 
 }

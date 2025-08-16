@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profileRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF5DF"
+    tools:context=".ui.account.ProfileActivity">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="프로필"
+        app:titleCentered="true"
+        app:titleTextColor="@android:color/black"
+        app:menu="@menu/menu_profile_top" />
+    <!-- 프로필 원형 아바타 + 상태뱃지 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/avatarCard"
+        style="@style/Widget.MaterialComponents.CardView"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        app:cardCornerRadius="48dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#DDE6EA"
+        app:strokeWidth="1dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/imgAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="24dp"
+            android:src="@drawable/ic_profile"
+            app:tint="#2C9CAB" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 작은 상태뱃지 (오른쪽 위 점) -->
+    <ImageView
+        android:id="@+id/imgBadge"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:src="@drawable/ic_badge_dot"
+        app:layout_constraintBottom_toTopOf="@id/avatarCard"
+        app:layout_constraintEnd_toEndOf="@id/avatarCard"
+        android:translationX="8dp"
+        android:translationY="8dp"
+        app:tint="#FFC107" />
+
+    <!-- 이름 + 지역 -->
+    <LinearLayout
+        android:id="@+id/texts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/avatarCard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="김지우"
+            android:textColor="@android:color/black"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tvRegion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="서울, 대한민국"
+            android:textColor="#6B6B6B"
+            android:textSize="13sp"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
+
+    <!-- 정보 카드 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/infoCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/texts"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:background="#FFF5DF">
+
+            <!-- 각 행: 제목 / 값 / 화살표 -->
+            <!-- 1. 닉네임 -->
+            <LinearLayout
+                style="@style/Profile_Row"
+                android:id="@+id/rowNickname">
+                <TextView style="@style/Profile_RowTitle" android:text="닉네임" />
+                <TextView android:id="@+id/tv_nickname_value" style="@style/Profile_RowValue" android:text="배우" />
+                <ImageView style="@style/Profile_RowChevron" />
+            </LinearLayout>
+
+            <!-- 2. 이름 -->
+            <View style="@style/Profile_Divider"/>
+            <LinearLayout style="@style/Profile_Row" android:id="@+id/rowName">
+                <TextView style="@style/Profile_RowTitle" android:text="이름" />
+                <TextView android:id="@+id/tv_name_value" style="@style/Profile_RowValue" android:text="김지우" />
+                <ImageView style="@style/Profile_RowChevron" />
+            </LinearLayout>
+
+            <!-- 3. 키 -->
+            <View style="@style/Profile_Divider"/>
+            <LinearLayout style="@style/Profile_Row" android:id="@+id/rowHeight">
+                <TextView style="@style/Profile_RowTitle" android:text="키" />
+                <TextView android:id="@+id/tv_height_value" style="@style/Profile_RowValue" android:text="170.3" />
+                <ImageView style="@style/Profile_RowChevron" />
+            </LinearLayout>
+
+            <!-- 4. 체중 -->
+            <View style="@style/Profile_Divider"/>
+            <LinearLayout style="@style/Profile_Row" android:id="@+id/rowWeight">
+                <TextView style="@style/Profile_RowTitle" android:text="체중" />
+                <TextView android:id="@+id/tv_weight_value" style="@style/Profile_RowValue" android:text="50.4" />
+                <ImageView style="@style/Profile_RowChevron" />
+            </LinearLayout>
+
+            <!-- 5. 성별 -->
+            <View style="@style/Profile_Divider"/>
+            <LinearLayout style="@style/Profile_Row" android:id="@+id/rowGender">
+                <TextView style="@style/Profile_RowTitle" android:text="성별" />
+                <TextView android:id="@+id/tv_gender_value" style="@style/Profile_RowValue" android:text="여" />
+                <ImageView style="@style/Profile_RowChevron" />
+            </LinearLayout>
+
+            <!-- 6. 거주지역 -->
+            <View style="@style/Profile_Divider"/>
+            <LinearLayout style="@style/Profile_Row" android:id="@+id/rowRegion">
+                <TextView style="@style/Profile_RowTitle" android:text="거주지역" />
+                <TextView android:id="@+id/tv_region_value" style="@style/Profile_RowValue" android:text="서울" />
+                <ImageView style="@style/Profile_RowChevron" />
+            </LinearLayout>
+
+            <!-- 로그아웃 버튼 -->
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLogout"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_gravity="end"
+        android:layout_marginTop="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="30dp"
+        android:text="로그아웃"
+        app:icon="@drawable/ic_logout"
+        android:drawableTint="@color/main_color"
+        app:iconPadding="8dp"
+        app:iconGravity="textStart"
+        app:strokeColor="#2C9CAB"
+        app:strokeWidth="1dp"
+        android:textColor="#2C9CAB"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
