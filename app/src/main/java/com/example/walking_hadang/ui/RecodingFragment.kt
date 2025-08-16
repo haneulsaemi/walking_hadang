@@ -51,7 +51,6 @@ class RecodingFragment : Fragment() {
             selectedDate.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.KOREA)
 
         )
-        requireActivity().findViewById<TextView>(R.id.toolbarTitle).text = "기록"
         setupWeekCalendar()
         val pager = binding.sectionPager
         pager.adapter = SectionPagerAdapter(this) // 아래 어댑터

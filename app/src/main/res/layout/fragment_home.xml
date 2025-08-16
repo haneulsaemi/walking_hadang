@@ -6,62 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/app_bg">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/app_bg"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="8dp"
-        app:elevation="0dp">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/tvGreeting"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="빼우 님\n안녕하세요!"
-                android:textAppearance="@style/TextAppearance.Material3.DisplaySmall"
-                android:textColor="@color/ink_primary"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/btnProfile"
-                app:layout_goneMarginEnd="12dp"/>
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/btnProfile"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:contentDescription="프로필"
-                android:src="@drawable/ic_profile"
-                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerFull"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="@id/tvGreeting"
-                app:tint="@color/ink_on_tint"
-                android:backgroundTint="@color/tint_circle"
-                android:padding="8dp"/>
-
-            <TextView
-                android:id="@+id/tvDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="8월 16일 금요일"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                android:textColor="@color/ink_secondary"
-                app:layout_constraintStart_toStartOf="@id/tvGreeting"
-                app:layout_constraintTop_toBottomOf="@id/tvGreeting"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll"
@@ -351,6 +295,10 @@
             </com.google.android.material.card.MaterialCardView>
 
 
+                <FrameLayout
+                    android:id="@+id/courseFragmentCatainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

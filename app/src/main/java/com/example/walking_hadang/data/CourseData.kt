@@ -24,6 +24,7 @@ data class CourseData(
     val endSpotNm: String?, //종료지점명
     val endRdnmadr: String?,//종료지점도로명주소
     val coursInfo: String?, // 경로정보
+    val instCallNumber: String?, //관리기관전화번호
     val institutionNm: String?, //관리기관명
     val insttNm: String? //제공기관명
 )

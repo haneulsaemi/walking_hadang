@@ -16,6 +16,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.LayoutRes
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -106,8 +107,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        requireActivity().findViewById<TextView>(R.id.toolbarTitle).text = "지도"
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -288,8 +287,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun showFloatingCard(marker: Marker, course: AssetCourseData){
-        Log.d("MapFragment", "FloatingCard 표시: ${course.name}, 좌표: ${course.latitude}, ${course.longitude}")
-
         val container = binding.floatingCardContainer
         container.removeAllViews()
 
@@ -300,6 +297,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val lengthView = cardView.findViewById<TextView>(R.id.lengthInfo)
         val timeView = cardView.findViewById<TextView>(R.id.timeInfo)
         val gotoBtn = cardView.findViewById<Button>(R.id.btnGoto)
+        val detailBtn = cardView.findViewById<Button>(R.id.btnDetail)
 
         val lat = course.latitude?.toDoubleOrNull()
         val lng = course.longitude?.toDoubleOrNull()
@@ -317,6 +315,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             true
         }
 
+        detailBtn.setOnClickListener {
+            showDetailCard(marker, course)
+        }
+
         cardView.isClickable = true
         cardView.isFocusableInTouchMode = true
         cardView.bringToFront()
@@ -330,6 +332,97 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             cardView.y = screenPosition.y - cardView.height - 30f // 마커 위 살짝 띄우기
         }
         container.visibility = View.VISIBLE
+    }
+
+    private fun showDetailCard(marker: Marker, course: AssetCourseData) {
+        showInFloating<View>(R.layout.item_course_detail_card) { detail ->
+            // 상세 바인딩…
+            detail.findViewById<View>(R.id.btnClose).setOnClickListener {
+                showFloatingCard(marker, course) // 뒤로
+            }
+            val lat = course.latitude?.toDoubleOrNull()
+            val lng = course.longitude?.toDoubleOrNull()
+
+            detail.findViewById<View>(R.id.btnGotoCourse).setOnClickListener {
+                if (lat != null && lng != null) {
+                    startGoogleNavigation(requireContext(),  lat, lng)
+                }
+                true
+            }
+            val tvTitle     = detail.findViewById<TextView>(R.id.tvTitle)
+            val tvDuration  = detail.findViewById<TextView>(R.id.tvDuration)
+            val chipLevel   = detail.findViewById<TextView>(R.id.chipLevel)
+            val tvDistance  = detail.findViewById<TextView>(R.id.tvDistance)
+            val tvStart     = detail.findViewById<TextView>(R.id.tvStart)
+            val tvEnd       = detail.findViewById<TextView>(R.id.tvEnd)
+            val tvRoute     = detail.findViewById<TextView>(R.id.tvRoute)
+            val tvPhone     = detail.findViewById<TextView>(R.id.tvPhone)
+            val tvOrg       = detail.findViewById<TextView>(R.id.tvOrg)
+            val imgPreview  = detail.findViewById<ImageView>(R.id.imgMapPreview)
+
+            // Helper
+            fun TextView.setTextOrGone(value: String?, prefix: String = "") {
+                if (value.isNullOrBlank()) {
+                    visibility = View.GONE
+                } else {
+                    text = prefix + value
+                    visibility = View.VISIBLE
+                }
+            }
+
+            // 제목
+            tvTitle.setTextOrGone(course.name)
+
+            // 거리/시간/난이도
+            tvDistance.setTextOrGone(course.length?.let { "  ·  $it" })
+            tvDuration.setTextOrGone(course.time)
+
+            // 난이도 필드가 별도로 없으니 기본값 표시
+            chipLevel.text = "보통"
+
+            // 시작/도착
+            val startText = course.startName
+                ?: course.startRoadAddress
+                ?: course.startJibunAddress
+            tvStart.setTextOrGone(startText, "시작: ")
+
+            val endText = course.endName
+                ?: course.endRoadAddress
+                ?: course.endJibunAddress
+            tvEnd.setTextOrGone(endText, "도착: ")
+
+            // 경로 요약
+            tvRoute.setTextOrGone(course.route?.replace("->", "→")?.trim(), "경로: ")
+
+            // 기관 전화/명
+            tvPhone.setTextOrGone(course.agencyPhone)
+            tvOrg.setTextOrGone(course.agencyName ?: course.orgName)
+
+            // 미니맵 프리뷰
+            imgPreview.setImageResource(R.drawable.ic_road)
+
+            positionNearMarker(detail, marker)
+        }
+    }
+    private fun <T: View> showInFloating(
+        @LayoutRes layoutRes: Int,
+        binder: (T) -> Unit
+    ) {
+        val container = binding.floatingCardContainer
+        container.removeAllViews()
+
+        @Suppress("UNCHECKED_CAST")
+        val view = layoutInflater.inflate(layoutRes, container, false) as T
+        container.addView(view)
+        container.visibility = View.VISIBLE
+        binder(view)
+    }
+    private fun positionNearMarker(view: View, marker: Marker) {
+        val screen = googleMap.projection.toScreenLocation(marker.position)
+        view.post {
+            view.x = screen.x - view.width / 2f
+            view.y = screen.y - view.height - 30f
+        }
     }
 
     override fun onRequestPermissionsResult(

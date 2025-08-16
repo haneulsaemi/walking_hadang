@@ -38,12 +38,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        val toolbar = binding.toolbar.toolbar
+        val toolbar = binding.toolbar
         setContentView(binding.root)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-
-        toolbar.findViewById<TextView>(R.id.toolbarTitle).text = ""
 
 
         supportFragmentManager.beginTransaction()

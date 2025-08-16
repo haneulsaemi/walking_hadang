@@ -9,8 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
-import com.example.walking_hadang.MyApplication
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.walking_hadang.R
+import com.example.walking_hadang.adapter.GlucoseTodayAdapter
 import com.example.walking_hadang.data.GlucoseData
 import com.example.walking_hadang.data.GlucoseType
 import com.example.walking_hadang.data.MealType
@@ -18,7 +19,6 @@ import com.example.walking_hadang.databinding.FragmentRecodeBloodSugarBinding
 import com.example.walking_hadang.util.GlucoseRepository
 import com.example.walking_hadang.util.chart.RoundedBarRenderer
 import com.github.mikephil.charting.charts.CombinedChart
-import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
@@ -30,10 +30,8 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.renderer.BarChartRenderer
 import com.github.mikephil.charting.renderer.CombinedChartRenderer
-import com.google.firebase.Timestamp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -59,6 +57,8 @@ class RecodeBloodSugarFragment : Fragment() {
     private var loadJob: Job? = null
     private lateinit var chart: CombinedChart
 
+    private lateinit var glucoseAdapter: GlucoseTodayAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -74,6 +74,9 @@ class RecodeBloodSugarFragment : Fragment() {
         setupChart()
         binding.tvSwitchLabel.text = if (swRange.isChecked) "주간" else "오늘"
         triggerLoad(swRange.isChecked)
+
+        setupGlucoseList()
+        loadTodayGlucose() // 초기 로딩
 
         swRange.setOnCheckedChangeListener { _, isChecked ->
             binding.tvSwitchLabel.text = if (isChecked) "주간" else "오늘"
@@ -103,8 +106,7 @@ class RecodeBloodSugarFragment : Fragment() {
                     return@setOnClickListener
                 }
             }
-            val note = binding.etNote.text.toString().ifBlank { null }
-            Log.d("GlucoseDebug", "메모: $note")
+
             // 끼니 (식후일 경우만)
             var mealType: MealType? = null
             var minutesAfter: Int? = null
@@ -131,7 +133,7 @@ class RecodeBloodSugarFragment : Fragment() {
                 type = type,
                 meal = mealType,
                 postprandialMinutes = minutesAfter,
-                memo = note ?: "" // note가 null이면 빈 문자열로
+                memo = "" // note가 null이면 빈 문자열로
             )
 
             GlucoseRepository.addGlucoseEntry(
@@ -432,6 +434,27 @@ class RecodeBloodSugarFragment : Fragment() {
         chart.invalidate()
     }
 
+    private fun loadTodayGlucose(date: java.time.LocalDate = java.time.LocalDate.now()) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val list = GlucoseRepository.getDaily(date)  // 이미 가지고 계신 일별 조회 메서드
+            if (list.isEmpty()) {
+                binding.rvGlucose.visibility = View.GONE
+                binding.tvGlucoseEmpty.visibility = View.VISIBLE
+            } else {
+                binding.tvGlucoseEmpty.visibility = View.GONE
+                binding.rvGlucose.visibility = View.VISIBLE
+                glucoseAdapter.submit(list)
+            }
+        }
+    }
+    private fun setupGlucoseList() {
+        binding.rvGlucose.layoutManager = LinearLayoutManager(requireContext())
+        glucoseAdapter = GlucoseTodayAdapter(onDelete = { item ->
+            // 삭제 로직(선택): GlucoseRepository.delete(item) 등
+            Toast.makeText(requireContext(), "삭제 준비: ${item.id}", Toast.LENGTH_SHORT).show()
+        })
+        binding.rvGlucose.adapter = glucoseAdapter
+    }
     override fun onDestroyView() {
         loadJob?.cancel()
         loadJob = null

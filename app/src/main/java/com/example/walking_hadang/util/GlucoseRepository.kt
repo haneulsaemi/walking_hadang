@@ -9,6 +9,9 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -54,7 +57,7 @@ object GlucoseRepository {
             .addOnFailureListener { onError(it) }
     }
 
-    suspend fun getDaily(date: Date = Date()): List<GlucoseData> {
+    suspend fun getDaily(date: LocalDate = LocalDate.now()): List<GlucoseData> {
         val key = dateKeyFrom(date)
         Log.d("GluDbg", "read path users/${uid()}/glucose/${key}/glucoseEntries")
         return MyApplication.db.collection("users").document(uid())
@@ -90,6 +93,30 @@ object GlucoseRepository {
         // ⚠️ 최초 실행 시 콘솔에서 복합 인덱스 생성 요구할 수 있음 (안내 링크 클릭)
         return q.get().await().toObjects(GlucoseData::class.java)
     }
+    // 오늘 하루 가장 최근 혈당 기록
+    suspend fun getTodayLatest(): GlucoseData? {
+
+        // 오늘 yyyy-MM-dd
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.KOREA)
+        val todayKey = sdf.format(java.util.Date())
+
+        return try {
+            val snap = MyApplication.db.collection("users")
+                .document(uid())
+                .collection("glucose")
+                .document(todayKey)
+                .collection("glucoseEntries")
+                .orderBy("recordedAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
+                .await()
+
+            snap.documents.firstOrNull()?.toObject(GlucoseData::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
     /** Timestamp → yyyy-MM-dd (로컬 TZ) */
     private fun dateKeyFrom(ts: Timestamp, zone: TimeZone = TimeZone.getDefault()): String {
@@ -105,6 +132,11 @@ object GlucoseRepository {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).apply { timeZone = zone }
         return sdf.format(date)
     }
+    private fun dateKeyFrom(localDate: LocalDate, zone: ZoneId = ZoneId.systemDefault()): String {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withLocale(Locale.KOREA)
+        return localDate.format(formatter)
+    }
+
 
     /** 주의 시작/끝(월요일 시작 기준). end는 다음 주 시작 직전(=exclusive) */
     private fun weekRange(of: Date, zone: TimeZone = TimeZone.getDefault()): Pair<Date, Date> {

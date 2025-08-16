@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    app:strokeColor="@android:color/transparent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- 닫기 버튼 -->
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:contentDescription="닫기"
+            app:srcCompat="@drawable/ic_close" />
+
+        <!-- 제목 -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="근대로의 여행 · 골목 투어 5코스"
+            android:textColor="#0F3D3E"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:lineSpacingExtra="2dp"
+            android:layout_marginTop="4dp"/>
+
+        <!-- 핵심 요약: 시간/난이도/거리 배지 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                app:srcCompat="@drawable/ic_time"
+                app:tint="#2C6E49" />
+
+            <TextView
+                android:id="@+id/tvDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="약 2시간"
+                android:textColor="#2C6E49"
+                android:textSize="14sp"
+                android:layout_marginStart="6dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="•"
+                android:textColor="#8AA3A4"
+                android:layout_marginHorizontal="8dp"/>
+
+            <TextView
+                android:id="@+id/chipLevel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="보통"
+                android:textColor="#0F3D3E"
+                android:textSize="13sp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"/>
+
+            <TextView
+                android:id="@+id/tvDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="  ·  2.1 km"
+                android:textColor="#2C6E49"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <!-- 미니 맵/경로 프리뷰 -->
+        <ImageView
+            android:id="@+id/imgMapPreview"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="12dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="경로 미리보기"
+            android:src="@drawable/ic_road"
+            android:background="#F1F5F4"/>
+
+        <!-- 정보 섹션 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="12dp">
+
+            <!-- 시작 지점 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="6dp">
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    app:srcCompat="@drawable/ic_start_flag"
+                    app:tint="#2C6E49" />
+                <TextView
+                    android:id="@+id/tvStart"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="시작: 대구 중구 덕산동 37-3"
+                    android:textColor="#0F3D3E"
+                    android:textSize="15sp"/>
+            </LinearLayout>
+
+            <!-- 도착 지점 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="6dp">
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    app:srcCompat="@drawable/ic_finish_flag"
+                    app:tint="#2C6E49" />
+                <TextView
+                    android:id="@+id/tvEnd"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="도착: 대구 중구 남산동 190-1"
+                    android:textColor="#0F3D3E"
+                    android:textSize="15sp"/>
+            </LinearLayout>
+
+            <!-- 하이라이트 포인트/경로 요약 -->
+            <TextView
+                android:id="@+id/tvRoute"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="경로: 별빛벗 보부상사 → 근대정동곡장"
+                android:textColor="#375A5C"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <!-- 구분선 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:background="#E6ECEB"/>
+
+        <!-- 연락/관리 정보 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                app:srcCompat="@drawable/ic_phone"
+                app:tint="#2C6E49" />
+
+            <TextView
+                android:id="@+id/tvPhone"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="053-661-2623"
+                android:textColor="#0F3D3E"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/tvOrg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="대구광역시 중구청"
+                android:textColor="#5E7778"
+                android:textSize="13sp"/>
+        </LinearLayout>
+
+        <!-- CTA -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGotoCourse"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:text="길 안내받기"
+            android:textAllCaps="false"
+            app:cornerRadius="16dp"
+            app:iconPadding="8dp"
+            app:iconGravity="textStart"
+            app:backgroundTint="#FFC42D"
+            app:strokeColor="@android:color/transparent"/>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

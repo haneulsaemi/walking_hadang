@@ -82,7 +82,7 @@ class ProfileActivity : AppCompatActivity() {
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
         lifecycleScope.launch {
-            val profile = UserProfileRepository.loadUserProfile()
+            val profile = UserProfileRepository.loadUserProfileOnce()
             if (profile == null) {
                 Log.e("ProfileActivity", "프로필 로딩 실패 또는 로그인 안됨")
                 return@launch
