@@ -15,6 +15,7 @@ import com.example.walking_hadang.MyApplication
 import com.example.walking_hadang.R
 import com.example.walking_hadang.databinding.ActivityMainBinding
 import com.example.walking_hadang.ui.account.ProfileActivity
+import com.example.walking_hadang.ui.store.StoreFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,6 +54,7 @@ class MainActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.nav_home -> switchFragment(HomeFragment())
                 R.id.nav_recoding -> switchFragment(RecodingFragment())
+                R.id.nav_market -> switchFragment(StoreFragment())
                 R.id.nav_map -> switchFragment(MapFragment())
                 R.id.nav_community -> switchFragment(CommunityFragment())
             }

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- 상단 영역 (스토어 제목 + 카테고리 버튼) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:paddingBottom="8dp"
+            android:text="스토어"
+            android:textColor="#000000"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <!-- 카테고리 버튼 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnFood"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#FFF1C7"
+                android:text="저당식품"
+                android:textStyle="bold"
+                android:textColor="#000000" />
+
+            <Button
+                android:id="@+id/btnClothes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#FFF1C7"
+                android:text="운동복"
+                android:textStyle="bold"
+                android:textColor="#000000" />
+
+            <Button
+                android:id="@+id/btnShoes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#FFF1C7"
+                android:text="운동화"
+                android:textStyle="bold"
+                android:textColor="#000000" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 하단 영역 (상품 리스트 / 배경색 FFF1C7) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="#FFF1C7">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewStore"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="8dp" />
+    </LinearLayout>
+
+</LinearLayout>
