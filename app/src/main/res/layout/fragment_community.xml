@@ -1,134 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.community.CommunityFragment"
-    android:background="@android:color/white">
+    android:orientation="vertical">
 
-    <!-- 상단 아이콘 영역 -->
+    <!-- 상단 영역 (흰색 배경) -->
     <LinearLayout
-        android:id="@+id/top_icons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
-        android:padding="16dp"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/iv_search"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_search"
-            android:contentDescription="검색" />
-
-        <ImageView
-            android:id="@+id/iv_notification"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_notify"
-            android:contentDescription="알림"
-            android:layout_marginStart="16dp"/>
-    </LinearLayout>
-
-    <!-- 제목 -->
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="커뮤니티"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginStart="16dp"
-        app:layout_constraintTop_toBottomOf="@id/top_icons"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <!-- 카테고리 Chip 그룹 -->
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chip_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_title"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:singleLine="true"
-        app:chipSpacing="8dp">
-
-        <com.google.android.material.chip.Chip
-            android:text="🏠 홈"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            style="@style/Widget.MaterialComponents.Chip.Choice"/>
-
-        <com.google.android.material.chip.Chip
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="🩸 혈당 공유"
-            style="@style/Widget.MaterialComponents.Chip.Choice"/>
-
-        <com.google.android.material.chip.Chip
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="🏋 운동 공유"
-            style="@style/Widget.MaterialComponents.Chip.Choice"/>
-
-        <com.google.android.material.chip.Chip
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="🌿 산책"
-            style="@style/Widget.MaterialComponents.Chip.Choice"/>
-
-        <com.google.android.material.chip.Chip
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="🥗 식품 공유"
-            style="@style/Widget.MaterialComponents.Chip.Choice"/>
-
-        <com.google.android.material.chip.Chip
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="🙋 자유게시판"
-            style="@style/Widget.MaterialComponents.Chip.Choice"/>
-    </com.google.android.material.chip.ChipGroup>
-
-    <!-- HOT 게시판 제목 + 더보기 -->
-    <LinearLayout
-        android:id="@+id/hot_section"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="12dp"
-        android:gravity="center_horizontal"
-        app:layout_constraintTop_toBottomOf="@id/chip_group">
+        android:background="#FFFFFF">
 
+        <!-- 제목 -->
         <TextView
-            android:id="@+id/tv_hot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🔥 HOT 게시판"
-            android:textSize="16sp"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/btn_more"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="더보기"
-            android:textColor="@android:color/darker_gray"/>
+            android:text="커뮤니티"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:layout_marginBottom="12dp"/>
     </LinearLayout>
 
-    <!-- 게시글 리스트 -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_posts"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+    <!-- 버튼 영역 (노란색 배경) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/hot_section"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:background="#FFF1C7">
+
+        <!-- 첫 번째 줄 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnHome"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🏠 홈"
+                android:background="@drawable/btn_category"
+                android:textColor="#000000"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBlood"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🩸 혈당 공유"
+                android:background="@drawable/btn_category"
+                android:textColor="#000000"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnExercise"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🏋 운동 공유"
+                android:background="@drawable/btn_category"
+                android:textColor="#000000"/>
+        </LinearLayout>
+
+        <!-- 두 번째 줄 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="8dp">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnWalk"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🚶 산책"
+                android:background="@drawable/btn_category"
+                android:textColor="#000000"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnFood"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🥗 식품 공유"
+                android:background="@drawable/btn_category"
+                android:textColor="#000000"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnFree"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🙋 자유게시판"
+                android:background="@drawable/btn_category"
+                android:textColor="#000000"
+                android:singleLine="true"
+                android:ellipsize="none"
+                android:scrollHorizontally="true"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"/>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- 하단 영역 (게시판 내용) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="#FFF1C7">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_centerInParent="true"
+            android:background="#0F6972"/>
+
+        <TextView
+            android:id="@+id/boardTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:text="홈 게시판"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewCommunity"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp" />
+    </LinearLayout>
+</LinearLayout>
