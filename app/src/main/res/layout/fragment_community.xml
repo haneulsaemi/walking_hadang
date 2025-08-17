@@ -4,24 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- 상단 영역 (흰색 배경) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp"
-        android:background="#FFFFFF">
 
-        <!-- 제목 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="커뮤니티"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:layout_marginBottom="12dp"/>
-    </LinearLayout>
 
     <!-- 버튼 영역 (노란색 배경) -->
     <LinearLayout
