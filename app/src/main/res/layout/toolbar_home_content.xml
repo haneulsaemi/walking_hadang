@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:paddingStart="20dp"
     android:paddingEnd="20dp"
-    android:paddingTop="16dp"
     android:paddingBottom="8dp">
 
     <TextView

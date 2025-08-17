@@ -9,6 +9,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -41,6 +44,35 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.qaMeal.setOnClickListener {
+            val fragment = RecodingFragment.newInstance(1) // 0: 혈당, 1: 식사, 2: 산책
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.main_fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+
+        }
+        binding.qaExercise.setOnClickListener {
+            val fragment = RecodingFragment.newInstance(2) // 0: 혈당, 1: 식사, 2: 산책
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.main_fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
+        binding.qaSleep.setOnClickListener {
+            val fragment = RecodingFragment.newInstance(1) // 0: 혈당, 1: 식사, 2: 산책
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.main_fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
+        binding.qaNote.setOnClickListener {
+            val fragment = RecodingFragment.newInstance(0) // 0: 혈당, 1: 식사, 2: 산책
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.main_fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
         childFragmentManager.beginTransaction()
             .replace(binding.courseFragmentCatainer.id, CourseListFragment())
             .commit()
@@ -54,17 +86,11 @@ class HomeFragment : Fragment() {
     }
     private fun setupToolbarContent() {
         val toolbar = requireActivity().findViewById<MaterialToolbar>(R.id.toolbar)
-        // 기본 타이틀/인셋 제거 (필요시)
-        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
-        toolbar.menu.clear()
-        toolbar.contentInsetStartWithNavigation = 0
-        toolbar.setContentInsetsAbsolute(0, 0)
 
         // 이미 추가된 커스텀 뷰가 있으면 제거
         removeToolbarContent()
 
-        // 홈 전용 컨텐츠 삽입
+        // ② 홈 전용 컨텐츠 삽입 (툴바의 기존 padding 보존됨)
         val v = layoutInflater.inflate(R.layout.toolbar_home_content, toolbar, false)
         val lp = Toolbar.LayoutParams(
             Toolbar.LayoutParams.MATCH_PARENT,

@@ -7,10 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.example.walking_hadang.R
 import com.example.walking_hadang.adapter.DayUi
 import com.example.walking_hadang.databinding.FragmentRecodingBinding
@@ -19,6 +22,7 @@ import com.example.walking_hadang.ui.recoding.RecodeMealFragment
 import com.example.walking_hadang.ui.recoding.RecodeWalkingFragment
 import com.example.walking_hadang.util.DayViewContainer
 import com.example.walking_hadang.util.GlucoseRepository
+import com.example.walking_hadang.util.RecodingSharedViewModel
 import com.google.android.material.datepicker.DayViewDecorator
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kizitonwose.calendar.core.Week
@@ -33,9 +37,22 @@ import java.util.Locale
 
 
 class RecodingFragment : Fragment() {
+    companion object {
+        fun newInstance(startPosition: Int): RecodingFragment {
+            val fragment = RecodingFragment()
+            val args = Bundle()
+            args.putInt("start_position", startPosition)
+            fragment.arguments = args
+            return fragment
+        }
+    }
     private var _binding: FragmentRecodingBinding? = null
     private val binding get() = _binding!!
+    private val sharedVM: RecodingSharedViewModel by viewModels()
     private var selectedDate: LocalDate = LocalDate.now()
+    private lateinit var viewPager: ViewPager2
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,18 +63,28 @@ class RecodingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding.tvSelectedDate.text = "%d. %d. %d (%s)".format(
             selectedDate.year, selectedDate.monthValue, selectedDate.dayOfMonth,
             selectedDate.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.KOREA)
 
         )
         setupWeekCalendar()
-        val pager = binding.sectionPager
-        pager.adapter = SectionPagerAdapter(this) // 아래 어댑터
+        viewPager = binding.sectionPager
+        viewPager.adapter = SectionPagerAdapter(this) // 아래 어댑터
 
         val tabs = binding.sectionTabs
-        val titles = listOf("혈당", "식단", "산책")
-        TabLayoutMediator(tabs, pager) { tab, pos -> tab.text = titles[pos] }.attach()
+        TabLayoutMediator(tabs, viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> "혈당"
+                1 -> "식사"
+                2 -> "산책"
+                else -> ""
+            }
+        }.attach()
+
+        val startPosition = arguments?.getInt("start_position") ?: 0
+        viewPager.setCurrentItem(startPosition, false)
 
     }
 
@@ -139,10 +166,25 @@ class RecodingFragment : Fragment() {
     }
 
     private fun onDateSelected(date: LocalDate) {
-        // 예: 일별 혈당 데이터 조회 후 차트 갱신
-        lifecycleScope.launch {
-            //val dailyData = GlucoseRepository.getDaily(date)
-            //renderDailyCombined(dailyData) // 기존 차트 그리는 함수
+        sharedVM.setSelectedDate(date)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        toolbar.findViewWithTag<View>("recodingTitleView")?.let {
+            toolbar.removeView(it)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        val titleView = LayoutInflater.from(context).inflate(R.layout.toolbar_custom, toolbar, false) as TextView
+        titleView.text = "기록"
+        titleView.apply {
+            tag = "recodingTitleView" // 중복 방지용 태그
+        }
+        toolbar.addView(titleView)
     }
 }

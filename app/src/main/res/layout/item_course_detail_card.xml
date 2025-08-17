@@ -84,17 +84,6 @@
                 android:textSize="14sp"/>
         </LinearLayout>
 
-        <!-- 미니 맵/경로 프리뷰 -->
-        <ImageView
-            android:id="@+id/imgMapPreview"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_marginTop="12dp"
-            android:scaleType="centerCrop"
-            android:contentDescription="경로 미리보기"
-            android:src="@drawable/ic_road"
-            android:background="#F1F5F4"/>
-
         <!-- 정보 섹션 -->
         <LinearLayout
             android:layout_width="match_parent"

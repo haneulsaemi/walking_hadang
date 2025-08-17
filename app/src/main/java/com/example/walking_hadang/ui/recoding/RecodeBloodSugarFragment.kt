@@ -5,10 +5,16 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.walking_hadang.R
 import com.example.walking_hadang.adapter.GlucoseTodayAdapter
@@ -17,6 +23,7 @@ import com.example.walking_hadang.data.GlucoseType
 import com.example.walking_hadang.data.MealType
 import com.example.walking_hadang.databinding.FragmentRecodeBloodSugarBinding
 import com.example.walking_hadang.util.GlucoseRepository
+import com.example.walking_hadang.util.RecodingSharedViewModel
 import com.example.walking_hadang.util.chart.RoundedBarRenderer
 import com.github.mikephil.charting.charts.CombinedChart
 import com.github.mikephil.charting.components.Legend
@@ -40,6 +47,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.getValue
 
 class RecodeBloodSugarFragment : Fragment() {
     private val COLOR_AXIS_BLUE = 0xFF2E8BEF.toInt()
@@ -59,6 +67,29 @@ class RecodeBloodSugarFragment : Fragment() {
 
     private lateinit var glucoseAdapter: GlucoseTodayAdapter
 
+    private val sharedVM: RecodingSharedViewModel by viewModels(
+        ownerProducer = { requireParentFragment() }
+    )
+
+    private val selectionMap: Map<String, Pair<GlucoseType, MealType?>> = mapOf(
+        "공복" to (GlucoseType.FASTING to null),
+        "아침 식후" to (GlucoseType.POSTPRANDIAL to MealType.BREAKFAST),
+        "점심 식후" to (GlucoseType.POSTPRANDIAL to MealType.LUNCH),
+        "저녁 식후" to (GlucoseType.POSTPRANDIAL to MealType.DINNER),
+        "취침 전" to (GlucoseType.BEDTIME to null)
+    )
+    private var selectedGlucoseType: GlucoseType = GlucoseType.FASTING
+    private var selectedMealType: MealType? = null
+
+
+
+    fun mapSelectionToTypes(selection: String): Pair<GlucoseType, MealType?> {
+        return selectionMap[selection]
+            ?: throw IllegalArgumentException("Unknown selection: $selection")
+    }
+
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -71,18 +102,49 @@ class RecodeBloodSugarFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val swRange = binding.swRange
 
+        //주간 혈당 그리기
         setupChart()
-        binding.tvSwitchLabel.text = if (swRange.isChecked) "주간" else "오늘"
+        binding.tvSwitchLabel.text = if (swRange.isChecked) "오늘" else "주간"
         triggerLoad(swRange.isChecked)
 
+        //혈당 그래프 드랍다운 메뉴
+        val dropdownButton =binding.dropdownButton
+        val dropdownText = binding.dropdownText
+
+        val items = listOf("공복", "아침 식후", "점심 식후", "저녁 식후", "취침 전")
+        val popupMenu = PopupMenu(requireContext(), dropdownButton)
+        items.forEachIndexed { index, item ->
+            popupMenu.menu.add(Menu.NONE, index, index, item)
+        }
+
+        dropdownButton.setOnClickListener {
+            popupMenu.show()
+        }
+
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            dropdownText.text = items[menuItem.itemId]
+            val (glucoseType, mealType) = mapSelectionToTypes(dropdownText.text.toString())
+            selectedGlucoseType = glucoseType
+            selectedMealType = mealType
+            triggerLoad(swRange.isChecked)
+            true
+        }
+
+
+        //오늘의 혈당 리스트 그리기
         setupGlucoseList()
         loadTodayGlucose() // 초기 로딩
 
+
         swRange.setOnCheckedChangeListener { _, isChecked ->
-            binding.tvSwitchLabel.text = if (isChecked) "주간" else "오늘"
+            binding.tvSwitchLabel.text = if (isChecked) "오늘" else "주간"
             triggerLoad(isChecked)
         }
 
+        binding.chipTimeGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+            binding.chipMealGroup.visibility =
+                if (checkedIds.contains(R.id.chipPost2h)) View.VISIBLE else View.GONE
+        }
 
         binding.btnAddGlucose.setOnClickListener {
             Log.d("GlucoseDebug", "버튼 클릭됨")
@@ -139,6 +201,10 @@ class RecodeBloodSugarFragment : Fragment() {
             GlucoseRepository.addGlucoseEntry(
                 raw = data,
                 onSuccess = { id ->
+                    binding.etGlucose.setText("")
+                    binding.etGlucose.isFocusable = false
+                    triggerLoad(swRange.isChecked)
+                    Toast.makeText(requireContext(), "기록되었습니다.", Toast.LENGTH_SHORT)
                     Log.d("GlucoseDebug", "저장 성공: $id")
                 },
                 onError = { e ->
@@ -223,19 +289,23 @@ class RecodeBloodSugarFragment : Fragment() {
 
         loadJob = viewLifecycleOwner.lifecycleScope.launch {
             try {
-                if (isWeekly) {
-                    // 주간 데이터
-                    val fasting = withContext(Dispatchers.IO) {
-                        GlucoseRepository.getWeeklyByType(GlucoseType.FASTING)
+                if (!isWeekly) {
+                    val data = withContext(Dispatchers.IO) {
+                        GlucoseRepository.getWeeklyByType(
+                            type = selectedGlucoseType,
+                            meal = selectedMealType
+                        )
                     }
-                    Log.d("glucose", fasting.toString())
+
+
+                    Log.d("glucose", data.toString())
                     // UI 업데이트는 메인 스레드
-                    Log.d("glucose" , "load weekly: done, count=${fasting.size}")
+                    Log.d("glucose" , "load weekly: done, count=${data.size}")
                     val keyFmt = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
                     val dayFmt = SimpleDateFormat("E", Locale.KOREA)
 
                     renderWeeklyCombined(
-                        data = fasting,
+                        data = data,
                         title = "주간 공복 평균",
                         labelOf = { gd ->
                             val d = keyFmt.parse(gd.dateKey)
@@ -436,14 +506,21 @@ class RecodeBloodSugarFragment : Fragment() {
 
     private fun loadTodayGlucose(date: java.time.LocalDate = java.time.LocalDate.now()) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val list = GlucoseRepository.getDaily(date)  // 이미 가지고 계신 일별 조회 메서드
-            if (list.isEmpty()) {
-                binding.rvGlucose.visibility = View.GONE
-                binding.tvGlucoseEmpty.visibility = View.VISIBLE
-            } else {
-                binding.tvGlucoseEmpty.visibility = View.GONE
-                binding.rvGlucose.visibility = View.VISIBLE
-                glucoseAdapter.submit(list)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                sharedVM.selectedDate.collect { date ->
+                    // 해당 날짜의 혈당 목록 로드
+                    val list = GlucoseRepository.getDaily(date)   // ← LocalDate 버전
+                    if (list.isEmpty()) {
+                        Log.d("loadToday", "오늘 혈당 기록 없음")
+                        binding.rvGlucose.visibility = View.GONE
+                        binding.tvGlucoseEmpty.visibility = View.VISIBLE
+                    } else {
+                        Log.d("loadToday", "오늘 혈당 기록 있음")
+                        binding.tvGlucoseEmpty.visibility = View.GONE
+                        binding.rvGlucose.visibility = View.VISIBLE
+                        glucoseAdapter.submit(list)
+                    }
+                }
             }
         }
     }
