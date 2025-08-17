@@ -6,7 +6,7 @@ import com.google.firebase.Timestamp
 enum class GlucoseType { FASTING, POSTPRANDIAL, BEDTIME }
 
 // MealType: 식후 측정일 때 끼니
-enum class MealType { BREAKFAST, LUNCH, DINNER, SNACK }
+enum class MealType { BREAKFAST, LUNCH, DINNER }
 
 data class GlucoseData(
     val id: String? = null,

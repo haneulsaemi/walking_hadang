@@ -10,6 +10,11 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import com.example.walking_hadang.MyApplication
 import com.example.walking_hadang.R
@@ -37,14 +42,27 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // ① 시스템바 공간을 우리가 처리 (Edge-to-Edge)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
-        val toolbar = binding.toolbar.toolbar
         setContentView(binding.root)
-        setSupportActionBar(toolbar)
+
+        // ② Toolbar 세팅
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        toolbar.findViewById<TextView>(R.id.toolbarTitle).text = ""
-
+        // ③ 상태바 인셋 → AppBar 상단 패딩으로
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { v, insets ->
+            val top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            if (top > 0) v.updatePadding(top = top)   // <- 상단 패딩은 여기서만
+            insets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomNavigation) { v, insets ->
+            val bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+            v.updatePadding(bottom = bottom)
+            insets
+        }
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.main_fragment_container, HomeFragment())
@@ -86,47 +104,6 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-
-    private fun showProfilePopup() {
-        val anchorView = findViewById<View>(R.id.menu_profile)
-        val popup = PopupMenu(this, anchorView)
-        popup.menuInflater.inflate(R.menu.menu_profile_popup, popup.menu)
-
-        val currentUser = MyApplication.auth.currentUser
-        val isLoggedIn = currentUser != null
-
-        popup.menu.findItem(R.id.menu_login).isVisible = !isLoggedIn
-        popup.menu.findItem(R.id.menu_logout).isVisible = isLoggedIn
-
-        popup.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.menu_login -> {
-                    // 로그인 화면 이동 등
-                    startActivity(Intent(this, LoginActivity::class.java))
-                    true
-                }
-                R.id.menu_logout -> {
-                    MyApplication.auth.signOut()
-                    Toast.makeText(this, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show()
-                    if (!MyApplication.checkAuth()) {
-                        startActivity(
-                            Intent(this, LoginActivity::class.java).apply {
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                            }
-                        )
-                        finish()
-                    }
-                    invalidateOptionsMenu() // 메뉴 갱신
-                    true
-                }
-                else -> false
-            }
-        }
-
-        popup.show()
-    }
-
-
 
     override fun onResume() {
         super.onResume()

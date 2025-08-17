@@ -9,17 +9,28 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.LayoutRes
 import androidx.annotation.RequiresPermission
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walking_hadang.R
 import com.example.walking_hadang.data.AssetCourseData
@@ -65,8 +76,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var googleMap: GoogleMap
     private lateinit var startButton: Button
-    private lateinit var mapFragment: SupportMapFragment
-    private lateinit var recyclerView: RecyclerView
 
     private var runningPolyline: Polyline? = null
     private var runningPath =  mutableListOf<LatLng>()
@@ -75,12 +84,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private var locationRequest: com.google.android.gms.location.LocationRequest? = null
     private lateinit var locationcallback: LocationCallback
-
+    private fun Int.dp(): Int =
+        (this * resources.displayMetrics.density).toInt()
     //지도 마커와 카드뷰 연결
     private val markerCourseMap = mutableMapOf<Marker, AssetCourseData>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         locationcallback = object : com.google.android.gms.location.LocationCallback() {
             override fun onLocationResult(result: com.google.android.gms.location.LocationResult) {
                 val map = googleMap ?: return
@@ -107,8 +118,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().findViewById<TextView>(R.id.toolbarTitle).text = "지도"
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -117,13 +126,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         startButton.setOnClickListener {
             if(isRunning){
-//                mapFragment.view?.visibility = View.INVISIBLE
-//                startButton.visibility = View.VISIBLE
                 saveDummyWalk()
                 startButton.text = "산책 시작하기"
             }else{
                 mapFragment.view?.visibility = View.VISIBLE
-//                startButton.visibility = View.GONE
                 startButton.text = "산책 종료하기"
                 startTracking()
             }
@@ -131,9 +137,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
 
         }
-//        childFragmentManager.beginTransaction()
-//            .replace(binding.courseFragmentCatainer.id, CourseListFragment())
-//            .commit()
     }
 
     override fun onMapReady(map: GoogleMap) {
@@ -148,8 +151,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     Log.d("MapFragment", "현재 위치: ${location.latitude}, ${location.longitude}")
                     val filteredList = LocationUtil.filterCoursesWithinRadius(
                         courseList,
-                        35.573418,
-                        129.189629,
+                        location.latitude,
+                        location.longitude,
                         radiusInKm = 20.0
                     )
                     Log.d("MapFragment", "필터링된 코스 개수: ${filteredList.size}")
@@ -235,10 +238,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun showCurrentLocation() {
         getCurrentLocation(
             onSuccess = { location ->
-                val currentLatLng = LatLng(35.573418, 129.189629)
+                val currentLatLng = LatLng(location.latitude, location.longitude)
                 googleMap?.apply {
-//                                clear()
-//                    addMarker(MarkerOptions().position(currentLatLng).title("현재 위치"))
+
                     moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 13f))
                     try {
                         isMyLocationEnabled = true
@@ -287,12 +289,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         return wrapper.records
     }
 
-    private fun showFloatingCard(marker: Marker, course: AssetCourseData){
-        Log.d("MapFragment", "FloatingCard 표시: ${course.name}, 좌표: ${course.latitude}, ${course.longitude}")
+    private fun hideFloatingCard() {
+        binding.floatingCardContainer.apply {
+            removeAllViews()
+            visibility = View.GONE
+            isClickable = false     // 다시 맵 터치 가능
+            isFocusable = false
+        }
+    }
 
+    private fun showFloatingCard(marker: Marker, course: AssetCourseData){
         val container = binding.floatingCardContainer
         container.removeAllViews()
-
+        container.apply {
+            isClickable = true      // 터치 먹음 → 지도 안 움직임
+            isFocusable = true
+            visibility = View.VISIBLE
+        }
         val cardView = layoutInflater.inflate(R.layout.item_course_card, binding.courseFragmentCatainer, false)
 
         val imageView = cardView.findViewById<ImageView>(R.id.image)
@@ -300,7 +313,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val lengthView = cardView.findViewById<TextView>(R.id.lengthInfo)
         val timeView = cardView.findViewById<TextView>(R.id.timeInfo)
         val gotoBtn = cardView.findViewById<Button>(R.id.btnGoto)
-
+        val detailBtn = cardView.findViewById<Button>(R.id.btnDetail)
+        val closeBtn = cardView.findViewById<ImageButton>(R.id.btnClose)
         val lat = course.latitude?.toDoubleOrNull()
         val lng = course.longitude?.toDoubleOrNull()
 
@@ -316,6 +330,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
             true
         }
+        closeBtn.setOnClickListener {
+            hideFloatingCard()
+        }
+
+        detailBtn.setOnClickListener {
+            showDetailCard(marker, course)
+        }
 
         cardView.isClickable = true
         cardView.isFocusableInTouchMode = true
@@ -330,6 +351,108 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             cardView.y = screenPosition.y - cardView.height - 30f // 마커 위 살짝 띄우기
         }
         container.visibility = View.VISIBLE
+    }
+
+    private fun placeDetailTopCenter(card: View) {
+        val lp = (card.layoutParams as FrameLayout.LayoutParams).apply {
+            width = FrameLayout.LayoutParams.MATCH_PARENT                   // 가로 꽉 차게
+            gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+            val m = 16.dp()
+            setMargins(m, m, m, 0)                                          // 좌우 여백 16dp
+        }
+        card.layoutParams = lp
+    }
+
+    private fun showDetailCard(marker: Marker, course: AssetCourseData) {
+        binding.floatingCardContainer.apply {
+            isClickable = true      // 터치 먹음 → 지도 안 움직임
+            isFocusable = true
+            visibility = View.VISIBLE
+        }
+        showInFloating<View>(R.layout.item_course_detail_card) { detail ->
+            // 상세 바인딩…
+            detail.findViewById<View>(R.id.btnClose).setOnClickListener {
+                hideFloatingCard()
+            }
+            val lat = course.latitude?.toDoubleOrNull()
+            val lng = course.longitude?.toDoubleOrNull()
+
+            detail.findViewById<View>(R.id.btnGotoCourse).setOnClickListener {
+                if (lat != null && lng != null) {
+                    startGoogleNavigation(requireContext(),  lat, lng)
+                }
+                true
+            }
+            val tvTitle     = detail.findViewById<TextView>(R.id.tvTitle)
+            val tvDuration  = detail.findViewById<TextView>(R.id.tvDuration)
+            val chipLevel   = detail.findViewById<TextView>(R.id.chipLevel)
+            val tvDistance  = detail.findViewById<TextView>(R.id.tvDistance)
+            val tvStart     = detail.findViewById<TextView>(R.id.tvStart)
+            val tvEnd       = detail.findViewById<TextView>(R.id.tvEnd)
+            val tvRoute     = detail.findViewById<TextView>(R.id.tvRoute)
+            val tvPhone     = detail.findViewById<TextView>(R.id.tvPhone)
+            val tvOrg       = detail.findViewById<TextView>(R.id.tvOrg)
+
+            // Helper
+            fun TextView.setTextOrGone(value: String?, prefix: String = "") {
+                if (value.isNullOrBlank()) {
+                    visibility = View.GONE
+                } else {
+                    text = prefix + value
+                    visibility = View.VISIBLE
+                }
+            }
+
+            // 제목
+            tvTitle.setTextOrGone(course.name)
+
+            // 거리/시간/난이도
+            tvDistance.setTextOrGone(course.length?.let { "  ·  $it" })
+            tvDuration.setTextOrGone(course.time)
+
+            // 난이도 필드가 별도로 없으니 기본값 표시
+            chipLevel.text = "보통"
+
+            // 시작/도착
+            val startText = course.startName
+                ?: course.startRoadAddress
+                ?: course.startJibunAddress
+            tvStart.setTextOrGone(startText, "시작: ")
+
+            val endText = course.endName
+                ?: course.endRoadAddress
+                ?: course.endJibunAddress
+            tvEnd.setTextOrGone(endText, "도착: ")
+
+            // 경로 요약
+            tvRoute.setTextOrGone(course.route?.replace("->", "→")?.trim(), "경로: ")
+
+            // 기관 전화/명
+            tvPhone.setTextOrGone(course.agencyPhone)
+            tvOrg.setTextOrGone(course.agencyName ?: course.orgName)
+
+            placeDetailTopCenter(detail)
+        }
+    }
+    private fun <T: View> showInFloating(
+        @LayoutRes layoutRes: Int,
+        binder: (T) -> Unit
+    ) {
+        val container = binding.floatingCardContainer
+        container.removeAllViews()
+
+        @Suppress("UNCHECKED_CAST")
+        val view = layoutInflater.inflate(layoutRes, container, false) as T
+        container.addView(view)
+        container.visibility = View.VISIBLE
+        binder(view)
+    }
+    private fun positionNearMarker(view: View, marker: Marker) {
+        val screen = googleMap.projection.toScreenLocation(marker.position)
+        view.post {
+            view.x = screen.x - view.width / 2f
+            view.y = screen.y - view.height - 30f
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -540,6 +663,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Log.e("WalkDebug", "임의 데이터 저장 실패", e)
             }
         )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        toolbar.findViewWithTag<View>("mapTitleView")?.let {
+            toolbar.removeView(it)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        val titleView = LayoutInflater.from(context).inflate(R.layout.toolbar_custom, toolbar, false) as TextView
+        titleView.text = "지도"
+        titleView.apply {
+            tag = "mapTitleView" // 중복 방지용 태그
+        }
+        toolbar.addView(titleView)
     }
 
 }

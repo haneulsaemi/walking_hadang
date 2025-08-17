@@ -36,7 +36,8 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
 
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/swRange"
@@ -172,22 +173,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- [2] 메모 -->
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="12dp"
-            android:hint="메모">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etNote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minLines="2"
-                android:gravity="top|start"
-                android:inputType="textMultiLine"/>
-        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- [3] 주간 그래프 -->
         <com.google.android.material.card.MaterialCardView
@@ -201,32 +186,77 @@
             app:strokeColor="@color/sky_blue"
             app:cardBackgroundColor="@android:color/transparent">
 
-        <LinearLayout
-            android:orientation="vertical"
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- 노란 헤더 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/chart_header_yellow"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tvChartTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:paddingStart="12dp"
+                        android:text="이번 주 공복 혈당 그래프"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        />
+                    <LinearLayout
+                        android:id="@+id/dropdownButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="8dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <TextView
+                            android:id="@+id/dropdownText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="공복"
+                            android:textColor="@color/black"
+                            android:textSize="13sp"/>
+
+                        <ImageView
+                            android:id="@+id/dropdownArrow"
+                            android:layout_width="12dp"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_arrow_down"
+                            android:paddingTop="3dp"
+                            android:layout_marginStart="4dp"/>
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+
+                <!-- 차트 자리 -->
+                <FrameLayout
+                    android:id="@+id/chartContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:padding="12dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <TextView
+            android:id="@+id/tvGlucoseEmpty"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <!-- 노란 헤더 -->
-            <TextView
-                android:id="@+id/tvChartTitle"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:gravity="center_vertical"
-                android:paddingStart="12dp"
-                android:text="이번 주 공복 혈당 그래프"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"
-                android:background="@color/chart_header_yellow"/>
-
-            <!-- 차트 자리 -->
-            <FrameLayout
-                android:id="@+id/chartContainer"
-                android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:padding="12dp"/>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
+            android:layout_height="wrap_content"
+            android:text="오늘은 기록된 혈당이 없어요."
+            android:textAlignment="center"
+            android:textColor="#1B1717"
+            android:padding="16dp"
+            android:layout_marginBottom="60dp"
+            android:visibility="gone"/>
         <!-- [4] 오늘의 혈당(리스트) -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvGlucose"
