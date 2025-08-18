@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#FFF1C7">
 
 
 
@@ -28,6 +29,9 @@
                 android:layout_weight="1"
                 android:text="🏠 홈"
                 android:background="@drawable/btn_category"
+                android:backgroundTint="@null"
+                android:clickable="true"
+                android:focusable="true"
                 android:textColor="#000000"/>
 
             <androidx.appcompat.widget.AppCompatButton
@@ -97,7 +101,7 @@
     <!-- 하단 영역 (게시판 내용) -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="vertical"
         android:background="#FFF1C7">
@@ -110,18 +114,34 @@
 
         <TextView
             android:id="@+id/boardTitle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="12dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
             android:text="홈 게시판"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#000000"/>
+            android:textColor="#0F6972"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/bg_board_title"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewCommunity"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="8dp" />
+            android:layout_height="1dp"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="20dp"
+            android:background="#FFF1C7"/>
+
+
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/communityContainer"
+            android:layout_width="match_parent"
+            android:background="#FFF1C7"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+
     </LinearLayout>
 </LinearLayout>
