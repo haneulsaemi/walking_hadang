@@ -126,8 +126,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         startButton.setOnClickListener {
             if(isRunning){
+                Toast.makeText(context, "산책을 종료합니다!", Toast.LENGTH_SHORT).show()
                 saveDummyWalk()
                 startButton.text = "산책 시작하기"
+                val fragment = RecodingFragment.newInstance(2) // 0: 혈당, 1: 식사, 2: 산책
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.main_fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
             }else{
                 mapFragment.view?.visibility = View.VISIBLE
                 startButton.text = "산책 종료하기"

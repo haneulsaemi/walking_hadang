@@ -60,6 +60,7 @@ class WalkAdapter(
                 Glide.with(img).load(url).into(img)
             } else {
                 img.setImageDrawable(null)
+                v.findViewById<TextView>(R.id.placeholderText).visibility = View.VISIBLE
             }
 
             v.setOnClickListener { onClick(item) }

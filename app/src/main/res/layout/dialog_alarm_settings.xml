@@ -15,65 +15,137 @@
         app:cardCornerRadius="20dp"
         app:cardUseCompatPadding="true"
         app:cardElevation="4dp">
-        <ImageView
-            android:id="@+id/btnClose"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="end"
-            android:layout_margin="4dp"
-            android:src="@drawable/ic_close"
-            android:contentDescription="닫기"
-            android:padding="4dp"
-            android:clickable="true"
-            android:focusable="true"/>
-        <LinearLayout
+        <FrameLayout
+            android:id="@+id/panelList"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <!-- 헤더: 제목 + 스위치 -->
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/btnClose"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="end"
+                android:layout_margin="4dp"
+                android:src="@drawable/ic_close"
+                android:contentDescription="닫기"
+                android:padding="4dp"
+                android:clickable="true"
+                android:focusable="true"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/tvTitle"
-                    android:layout_width="0dp"
+                <!-- 헤더: 제목 + 스위치 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="알림 설정"
-                    android:textStyle="bold"
-                    android:textSize="18sp"
-                    android:textColor="#222222" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/swEnableAll"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/tvTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="알림 설정"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:textColor="#222222" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/swEnableAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="알림 허용"
+                        android:textColor="#666666"/>
+                </LinearLayout>
+
+                <!-- 설명/간격 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp"/>
+
+                <!-- 알림 리스트 -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvAlarms"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="알림 허용"
-                    android:textColor="#666666"/>
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never" />
+
+                <!-- 하단 여백 (FAB와 겹치지 않도록) -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"/>
             </LinearLayout>
+        </FrameLayout>
+        <LinearLayout
+            android:id="@+id/panelEditor"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-            <!-- 설명/간격 -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="12dp"/>
-
-            <!-- 알림 리스트 -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvAlarms"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:overScrollMode="never" />
+                android:hint="알림 이름을 작성해 주세요">
 
-            <!-- 하단 여백 (FAB와 겹치지 않도록) -->
-            <View
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="시간을 입력해 주세요" />
+
+            <!-- 시간 선택 -->
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="56dp"/>
+                android:layout_height="wrap_content"
+                android:hint="시간">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="true" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/swEnabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="알림을 허용" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:layout_marginTop="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:text="취소"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnOk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="완료"/>
+            </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

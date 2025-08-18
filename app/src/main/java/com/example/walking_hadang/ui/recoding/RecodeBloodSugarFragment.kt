@@ -39,6 +39,7 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.renderer.BarChartRenderer
 import com.github.mikephil.charting.renderer.CombinedChartRenderer
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -159,9 +160,9 @@ class RecodeBloodSugarFragment : Fragment() {
             Log.d("GlucoseDebug", "혈당 값(Int): $value")
             // 측정 종류
             val type = when (binding.chipTimeGroup.checkedChipId) {
-                R.id.chipFasting ->  GlucoseType.FASTING
-                R.id.chipPost2h ->  GlucoseType.POSTPRANDIAL
-                R.id.chipBeforeBed ->  GlucoseType.BEDTIME
+                R.id.chipFasting -> GlucoseType.FASTING
+                R.id.chipPost2h -> GlucoseType.POSTPRANDIAL
+                R.id.chipBeforeBed -> GlucoseType.BEDTIME
                 else -> {
                     Log.w("GlucoseDebug", "측정 종류 미선택")
                     Toast.makeText(requireContext(), "측정 종류를 선택하세요.", Toast.LENGTH_SHORT).show()
@@ -174,14 +175,15 @@ class RecodeBloodSugarFragment : Fragment() {
             var minutesAfter: Int? = null
             if (type == GlucoseType.POSTPRANDIAL) {
                 mealType = when (binding.chipMealGroup.checkedChipId) {
-                    R.id.chipBreakfast ->  MealType.BREAKFAST
+                    R.id.chipBreakfast -> MealType.BREAKFAST
 
-                    R.id.chipLunch ->  MealType.LUNCH
+                    R.id.chipLunch -> MealType.LUNCH
 
-                    R.id.chipDinner ->  MealType.DINNER
+                    R.id.chipDinner -> MealType.DINNER
                     else -> {
                         Log.w("GlucoseDebug", "식후인데 끼니 미선택")
-                        Toast.makeText(requireContext(), "식후 측정 시 끼니를 선택하세요.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "식후 측정 시 끼니를 선택하세요.", Toast.LENGTH_SHORT)
+                            .show()
                         return@setOnClickListener
                     }
                 }
@@ -197,20 +199,30 @@ class RecodeBloodSugarFragment : Fragment() {
                 postprandialMinutes = minutesAfter,
                 memo = "" // note가 null이면 빈 문자열로
             )
-
-            GlucoseRepository.addGlucoseEntry(
-                raw = data,
-                onSuccess = { id ->
-                    binding.etGlucose.setText("")
-                    binding.etGlucose.isFocusable = false
-                    triggerLoad(swRange.isChecked)
-                    Toast.makeText(requireContext(), "기록되었습니다.", Toast.LENGTH_SHORT)
-                    Log.d("GlucoseDebug", "저장 성공: $id")
-                },
-                onError = { e ->
+            binding.btnAddGlucose.isEnabled = false
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    GlucoseRepository.addGlucoseEntry(
+                        raw = data,
+                        onSuccess = { id ->
+                            binding.etGlucose.setText("")
+                            binding.etGlucose.isFocusable = false
+                            triggerLoad(swRange.isChecked)
+                            Snackbar.make(requireView(), "기록되었습니다.", Snackbar.LENGTH_SHORT).show()
+                            Log.d("GlucoseDebug", "저장 성공: $id")
+                        },
+                        onError = { e ->
+                            Log.e("GlucoseDebug", "저장 실패", e)
+                        }
+                    )
+                }catch (e: Exception) {
                     Log.e("GlucoseDebug", "저장 실패", e)
+                    Snackbar.make(requireView(), "저장 실패: ${e.localizedMessage}", Snackbar.LENGTH_SHORT).show()
+                } finally {
+                    binding.btnAddGlucose.isEnabled = true
                 }
-            )
+
+            }
         }
     }
 

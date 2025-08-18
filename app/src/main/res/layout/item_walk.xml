@@ -6,13 +6,28 @@
     android:background="@drawable/bg_item_outline"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/imgThumb"
+            android:layout_width="120dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:background="#EEE" />
+        <TextView
+            android:id="@+id/placeholderText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="경로정보가 없습니다"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:textColor="#888888"
+            android:textSize="12sp"
+            android:visibility="gone"/>
+    </FrameLayout>
 
-    <ImageView
-        android:id="@+id/imgThumb"
-        android:layout_width="120dp"
-        android:layout_height="80dp"
-        android:scaleType="centerCrop"
-        android:background="#EEE"/>
+
 
     <LinearLayout
         android:orientation="vertical"

@@ -128,6 +128,8 @@ dependencies {
 
     //gridlayout
     implementation("androidx.gridlayout:gridlayout:1.0.0")
+
+    implementation("androidx.transition:transition:1.5.1")
 }
 
 secrets{
