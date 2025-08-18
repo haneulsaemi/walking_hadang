@@ -27,12 +27,6 @@ object WalkRepository {
             .document(dateKey)
             .collection("walkEntries")
 
-    /** 상위 walks(날짜 문서) 레퍼런스 */
-    private fun walksColl() =
-        MyApplication.db.collection("users")
-            .document(uid())
-            .collection("walks")
-
     /** 생성 */
     fun addWalkEntry(
         raw: WalkData,
@@ -90,61 +84,6 @@ object WalkRepository {
             .orderBy("startedAt", Query.Direction.DESCENDING)
             .limit(pageSize.toLong())
             .get()
-            .addOnSuccessListener { snap -> onSuccess(snap.toObjects()) }
-            .addOnFailureListener { onError(it) }
-    }
-
-    /** 특정 날짜의 실시간 구독 */
-    fun observeWalksByDate(
-        dateKey: String,
-        descending: Boolean = true,
-        onUpdate: (List<WalkData>) -> Unit,
-        onError: (Exception) -> Unit
-    ): ListenerRegistration {
-        val q = entriesColl(dateKey)
-            .orderBy(
-                "startedAt",
-                if (descending) Query.Direction.DESCENDING else Query.Direction.ASCENDING
-            )
-
-        return q.addSnapshotListener { snap, e ->
-            if (e != null) {
-                onError(e)
-                return@addSnapshotListener
-            }
-            val list = snap?.toObjects<WalkData>().orEmpty()
-            onUpdate(list)
-        }
-    }
-
-    /** 단일 엔트리 로드 */
-    fun loadWalkEntry(
-        dateKey: String,
-        entryId: String,
-        onSuccess: (WalkData?) -> Unit,
-        onError: (Exception) -> Unit
-    ) {
-        entriesColl(dateKey).document(entryId)
-            .get()
-            .addOnSuccessListener { doc -> onSuccess(doc.toObject(WalkData::class.java)) }
-            .addOnFailureListener { onError(it) }
-    }
-
-    /** 페이징: 특정 날짜의 다음 페이지 */
-    fun loadWalksByDatePaged(
-        dateKey: String,
-        pageSize: Long,
-        startAfterStartedAt: com.google.firebase.Timestamp? = null,
-        onSuccess: (List<WalkData>) -> Unit,
-        onError: (Exception) -> Unit
-    ) {
-        var q = entriesColl(dateKey)
-            .orderBy("startedAt", Query.Direction.DESCENDING)
-            .limit(pageSize)
-
-        if (startAfterStartedAt != null) q = q.startAfter(startAfterStartedAt)
-
-        q.get()
             .addOnSuccessListener { snap -> onSuccess(snap.toObjects()) }
             .addOnFailureListener { onError(it) }
     }

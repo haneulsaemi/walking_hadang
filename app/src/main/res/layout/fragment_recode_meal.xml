@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="12dp">
 
@@ -97,7 +97,31 @@
                         android:textColor="#5B4C22"
                         app:cornerRadius="24dp"/>
                 </LinearLayout>
+                <FrameLayout
+                    android:id="@+id/previewContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_marginTop="8dp">
 
+                    <ImageView
+                        android:id="@+id/ivPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="160dp"
+                        android:scaleType="centerCrop" />
+
+                    <!-- 작은 취소(X) 버튼 -->
+                    <ImageButton
+                        android:id="@+id/btnClearPreview"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="top|end"
+                        android:layout_margin="8dp"
+                        android:background="@drawable/bg_circle_dim"
+                        android:src="@drawable/ic_close"
+                        android:contentDescription="이미지 선택 취소 버튼"
+                        app:tint="@android:color/white" />
+                </FrameLayout>
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"

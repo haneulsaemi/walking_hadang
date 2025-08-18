@@ -71,6 +71,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation("androidx.fragment:fragment-ktx:1.8.2")
+    implementation("androidx.activity:activity-ktx:1.9.2")
+
     implementation("androidx.preference:preference:1.2.1")
     implementation ("com.google.android.material:material:1.12.0")
 
@@ -84,6 +87,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
 
     implementation("com.google.firebase:firebase-firestore-ktx:24.7.1")
+    implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-messaging-ktx:23.4.1")

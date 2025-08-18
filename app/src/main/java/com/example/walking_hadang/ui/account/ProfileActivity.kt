@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
+import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -17,6 +18,7 @@ import com.example.walking_hadang.MyApplication
 import com.example.walking_hadang.R
 import com.example.walking_hadang.data.UserProfileData
 import com.example.walking_hadang.databinding.ActivityProfileBinding
+import com.example.walking_hadang.ui.AlarmSettingsDialog
 import com.example.walking_hadang.ui.LoginActivity
 import com.example.walking_hadang.util.UserProfileRepository
 import kotlinx.coroutines.CoroutineScope
@@ -99,6 +101,16 @@ class ProfileActivity : AppCompatActivity() {
         binding.topBar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
+        binding.topBar.setOnMenuItemClickListener { menuItem->
+            when (menuItem.itemId) {
+                R.id.action_notification ->{
+                    Log.d("ProfileMenuClick", "알림 메뉴 클릭")
+                    AlarmSettingsDialog().show(supportFragmentManager, "alarm")
+                    true
+                }
+                else -> false
+            }
+        }
 
         binding.rowNickname.setOnClickListener {
             val current = binding.tvNicknameValue.text.toString()
@@ -138,6 +150,7 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun openEditField(key: String, label: String, value: String, inputType: Int) {
         val intent = Intent(this, EditFieldActivity::class.java).apply {
             putExtra("key", key)

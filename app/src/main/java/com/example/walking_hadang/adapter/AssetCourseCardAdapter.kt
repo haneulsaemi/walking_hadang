@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.walking_hadang.data.AssetCourseData
 import com.example.walking_hadang.data.CourseData
 import com.example.walking_hadang.databinding.ItemCourseCardBinding
+import com.example.walking_hadang.databinding.ItemCourseCardHomeBinding
 
 class AssetCourseCardAdapter(private var items: List<AssetCourseData>) :
     RecyclerView.Adapter<AssetCourseCardAdapter.CourseViewHolder>() {

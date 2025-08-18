@@ -32,7 +32,7 @@ class CourseListFragment : Fragment() {
     private var _binding: FragmentCourseListBinding? = null
     private val binding get() = _binding!!
     private lateinit var courseAdapter: AssetCourseCardAdapter
-
+    private lateinit var homeCourseAdapter: CourseCardAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,13 +42,25 @@ class CourseListFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+       val parent = parentFragment
+        val fragmentName = parent?.javaClass?.simpleName
+
         val recyclerView = binding.courseRecyclerView
         recyclerView.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        courseAdapter = AssetCourseCardAdapter(emptyList())
-        recyclerView.adapter = courseAdapter
         val tempList = LocationUtil.filterCoursesWithinRadius(loadCoursesFromAsset(), 37.5665, 126.9780)
-        courseAdapter.updateData(tempList)
+
+        if (fragmentName.equals("HomeFragment")){
+            homeCourseAdapter = CourseCardAdapter(emptyList())
+            recyclerView.adapter = homeCourseAdapter
+            homeCourseAdapter.updateData(tempList)
+        }else{
+            courseAdapter = AssetCourseCardAdapter(emptyList())
+            recyclerView.adapter = courseAdapter
+            courseAdapter.updateData(tempList)
+        }
+
+
 
 //        fetchCourse(recyclerView)
     }
@@ -66,36 +78,6 @@ class CourseListFragment : Fragment() {
             e.printStackTrace()
             emptyList()
         }
-    }
-    // 공공데이터 api를 이용해 산책 코스 불러오기
-    private fun fetchCourse(recyclerView: RecyclerView){
-        CourseRetrofit.Companion.courseApiService.getWalkingCourses(
-            serviceKey = BuildConfig.WALK_API_KEY,
-            pageNo = 1,
-            numOfRows = 100,
-            type = "json"
-        ).enqueue(object : Callback<CourseResponse> {
-
-            override fun onResponse(call: Call<CourseResponse?>, response: Response<CourseResponse?>) {
-                Log.d("Retrofit", "Response success: ${response.isSuccessful}")
-                Log.d("Retrofit", "Response: ${response}")
-                Log.d("Retrofit", "Response body: ${response.body()}")
-                Log.e("Retrofit", "Raw Error: ${response.errorBody()?.string()}")
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    val courseList = body?.response?.body?.items?: emptyList<CourseData>()
-//                    courseAdapter = CourseCardAdapter(courseList as List<CourseData>)
-//                    recyclerView.adapter = courseAdapter
-                } else {
-                    Log.e("Retrofit", "응답 실패: ${response.code()}")
-                }
-            }
-            override fun onFailure(call: Call<CourseResponse?>, t: Throwable) {
-
-                Log.e("API_ERROR", "onFailure: ${t.message}")
-                Toast.makeText(requireContext(), "API 연동 오류: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
     }
 
 }

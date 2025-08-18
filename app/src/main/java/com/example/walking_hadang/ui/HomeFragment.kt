@@ -6,11 +6,13 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -73,11 +75,15 @@ class HomeFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
+        val fragment = CourseListFragment()
         childFragmentManager.beginTransaction()
-            .replace(binding.courseFragmentCatainer.id, CourseListFragment())
+            .replace(binding.courseFragmentCatainer.id, fragment)
             .commit()
+
         setupToolbarContent()
     }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()
