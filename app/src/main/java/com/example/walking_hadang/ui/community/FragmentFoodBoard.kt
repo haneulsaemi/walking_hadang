@@ -13,7 +13,7 @@ import com.example.walking_hadang.R
 import com.example.walking_hadang.databinding.FragmentFoodBoardBinding
 
 class FragmentFoodBoard : Fragment() {
-
+    //테스트
     private var _binding: FragmentFoodBoardBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: SugarPostAdapter

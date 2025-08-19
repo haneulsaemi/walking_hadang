@@ -17,7 +17,7 @@ class FragmentWalkBoard : Fragment() {
     private var _binding: FragmentWalkBoardBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: SugarPostAdapter
-
+    //테스트
     private val boardsVm: CommunityBoardsViewModel by viewModels(ownerProducer = { requireParentFragment() })
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

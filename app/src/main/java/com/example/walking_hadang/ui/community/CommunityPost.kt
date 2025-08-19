@@ -9,3 +9,4 @@ data class CommunityPost(
     val createdAt: Long = 0L,   // epoch millis
     val badge: String? = "혈당 공유"
 )
+//테스트

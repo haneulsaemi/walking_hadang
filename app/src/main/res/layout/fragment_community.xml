@@ -105,7 +105,7 @@
         android:layout_weight="1"
         android:orientation="vertical"
         android:background="#FFF1C7">
-
+        //테스트
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

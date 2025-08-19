@@ -7,7 +7,7 @@
     android:padding="10dp"
     android:layout_marginBottom="4dp"
     android:elevation="2dp">
-
+    //테스트
     <!-- 게시판 배지 -->
     <TextView
         android:id="@+id/tvBadge"

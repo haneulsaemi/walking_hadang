@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 class CommunityBoardsViewModel : ViewModel() {
 
     // 혈당 공유
+    //테스트
     private val _sugar = MutableLiveData<List<CommunityPost>>(emptyList())
     val sugar: LiveData<List<CommunityPost>> get() = _sugar
     fun addSugar(post: CommunityPost) { _sugar.value = listOf(post) + (_sugar.value ?: emptyList()) }

@@ -80,7 +80,7 @@ class FragmentSugarBoard : Fragment() {
         ensureFabVisible()
         parentFragmentManager.addOnBackStackChangedListener(backstackListener)
     }
-
+    //테스트
     override fun onResume() {
         super.onResume()
         ensureFabVisible()

@@ -20,7 +20,7 @@ class FragmentFreeBoard : Fragment() {
 
     private val boardsVm: CommunityBoardsViewModel by viewModels(ownerProducer = { requireParentFragment() })
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater,  container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentFreeBoardBinding.inflate(inflater, container, false)
         return binding.root
     }

@@ -13,7 +13,7 @@ import com.example.walking_hadang.R
 class HomeHotAdapter(
     private val onClick: (CommunityPost) -> Unit
 ) : ListAdapter<CommunityPost, HomeHotAdapter.VH>(diff) {
-
+    //테스트
     companion object {
         private const val NEW_WINDOW_MS = 24 * 60 * 60 * 1000L   // ✅ 추가 (24시간)
         val diff = object : DiffUtil.ItemCallback<CommunityPost>() {

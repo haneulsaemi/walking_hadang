@@ -82,7 +82,7 @@ class WritePostFragment : Fragment() {
             Snackbar.make(requireView(), "입력값을 확인해주세요.", Snackbar.LENGTH_SHORT).show()
             return
         }
-
+//테스트
         // 결과 전달
         val bundle = Bundle().apply {
             putString(BUNDLE_TITLE, title)

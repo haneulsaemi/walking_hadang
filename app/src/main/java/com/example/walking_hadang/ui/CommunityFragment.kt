@@ -21,7 +21,7 @@ import com.example.walking_hadang.ui.community.FragmentExerciseBoard
 import com.example.walking_hadang.ui.community.FragmentWalkBoard
 import com.example.walking_hadang.ui.community.FragmentFoodBoard
 import com.example.walking_hadang.ui.community.FragmentFreeBoard
-
+//테스트
 class CommunityFragment : Fragment() {
     private var _binding: FragmentCommunityBinding? = null
     private val binding get() = _binding!!

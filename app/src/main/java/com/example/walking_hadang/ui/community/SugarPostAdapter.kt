@@ -29,7 +29,7 @@ class SugarPostAdapter(
         private val tvComments = v.findViewById<TextView>(R.id.tvComments)
         private val tvTime = v.findViewById<TextView>(R.id.tvTime)
         private val tvNew = v.findViewById<TextView>(R.id.tvNew) // ⬅ 추가
-
+        //테스트
         fun bind(item: CommunityPost) {
             // 배지
             tvBadge.text = item.badge ?: ""

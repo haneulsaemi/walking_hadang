@@ -15,7 +15,7 @@ class HomeHotFragment : Fragment() {
 
     private var _binding: FragmentHomeHotBinding? = null
     private val binding get() = _binding!!
-
+    //테스트
     private val db by lazy { FirebaseFirestore.getInstance() }
     private lateinit var adapter: HomeHotAdapter
 
