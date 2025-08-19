@@ -6,7 +6,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.walking_hadang.R
 import com.example.walking_hadang.databinding.FragmentStoreBinding
 import com.google.gson.Gson
 
@@ -51,6 +54,24 @@ class StoreFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("StoreFragment", "JSON Load Error: ${e.message}")
         }
+    }
+    override fun onPause() {
+        super.onPause()
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        toolbar.findViewWithTag<View>("storeTitleView")?.let {        // 태그명 변경해서 사용
+            toolbar.removeView(it)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        val titleView = LayoutInflater.from(context).inflate(R.layout.toolbar_custom, toolbar, false) as TextView
+        titleView.text = "스토어"    // 원하는 타이틀로 변경
+        titleView.apply {
+            tag = "storeTitleView"    // 태그명 변경해서 사용
+        }
+        toolbar.addView(titleView)
     }
 
     override fun onDestroyView() {

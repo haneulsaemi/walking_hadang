@@ -12,15 +12,7 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:paddingBottom="8dp"
-            android:text="스토어"
-            android:textColor="#000000"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+
 
         <!-- 카테고리 버튼 -->
         <LinearLayout
