@@ -134,7 +134,7 @@ class CommunityFragment : Fragment() {
         super.onResume()
         val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar) ?: return
         val titleView = LayoutInflater.from(context)
-            .inflate(R.layout.toolbar_custom, toolbar, false) as TextView
+                .inflate(R.layout.toolbar_custom, toolbar, false) as TextView
         titleView.text = "커뮤니티"
         titleView.tag = "communityTitleView"
         toolbar.addView(titleView)
