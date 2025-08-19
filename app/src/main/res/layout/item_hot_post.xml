@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="14dp"
+    app:strokeColor="#E6EEF1"
+    app:strokeWidth="1dp"
+    app:cardBackgroundColor="#FFFFFF">
+    //테스트
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <!-- 상단 배지 + NEW 표시 함께 배치 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <!-- 게시판 배지 -->
+            <TextView
+                android:id="@+id/tvBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="식품공유게시판"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#D17C00"
+                android:background="#FFF4E1"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:includeFontPadding="false"
+                android:gravity="center" />
+
+            <!-- NEW 배지 -->
+            <TextView
+                android:id="@+id/tvNew"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="N"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#D32F2F"
+                android:background="#66FF0000"
+                android:paddingHorizontal="4dp"
+                android:paddingVertical="1dp"
+                android:layout_marginStart="6dp"
+                android:includeFontPadding="false"
+                android:gravity="center"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- 제목 -->
+        <TextView
+            android:id="@+id/tvPostTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="제목"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#0D1B2A"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <!-- 내용 미리보기 -->
+        <TextView
+            android:id="@+id/tvPostPreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="내용 미리보기"
+            android:textSize="14sp"
+            android:textColor="#3E8A99"
+            android:layout_marginTop="4dp"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <!-- 하단 메타 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/tvLikes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="👍 0"
+                android:textSize="12sp"
+                android:textColor="#78909C" />
+
+            <TextView
+                android:id="@+id/tvComments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="  ·  💬 0"
+                android:textSize="12sp"
+                android:textColor="#78909C" />
+
+            <TextView
+                android:id="@+id/tvTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="  ·  1시간 전"
+                android:textSize="12sp"
+                android:textColor="#90A4AE"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

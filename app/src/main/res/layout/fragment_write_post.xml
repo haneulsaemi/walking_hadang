@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootWrite"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+    //테스트
+    <!-- 상단 앱바 -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        app:title="글 쓰기"
+        app:titleCentered="true"
+        app:navigationIcon="@drawable/ic_close2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 오른쪽 '완료' 텍스트 버튼 -->
+        <TextView
+            android:id="@+id/tvActionDone"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="완료"
+            android:textStyle="bold"
+            android:textColor="#0F6972"
+            android:layout_gravity="end|center_vertical" />
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <!-- 내용 영역 -->
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:background="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="#FFFFFF">
+
+            <!-- 제목 + 카메라 버튼 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/titleRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- 제목 (테두리 제거, 힌트/텍스트 색 지정) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tiTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="제목을 입력해주세요."
+                    app:boxBackgroundMode="none"
+                    app:hintTextColor="#0F6972"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/btnAddImage"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:textColor="#0F6972"
+                        android:textColorHint="#0F6972"
+                        android:background="@android:color/transparent"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- 사진 첨부 버튼 -->
+                <ImageButton
+                    android:id="@+id/btnAddImage"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="이미지 첨부"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_camera"
+                    app:tint="#0F6972"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <!-- 제목 아래 보더(bottom only) -->
+                <View
+                    android:id="@+id/titleBottomBorder"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:background="#0F6972"
+                    app:layout_constraintTop_toBottomOf="@id/tiTitle"
+                    app:layout_constraintStart_toStartOf="@id/tiTitle"
+                    app:layout_constraintEnd_toStartOf="@id/btnAddImage"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginTop="6dp"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- 내용 (테두리 제거) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tiContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="공유하고 싶은 글을 작성해주세요."
+                app:boxBackgroundMode="none"
+                app:hintTextColor="#0F6972">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:gravity="top|start"
+                    android:inputType="textMultiLine"
+                    android:textColor="#0F6972"
+                    android:textColorHint="#0F6972"
+                    android:background="@android:color/transparent"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- 선택 이미지 미리보기 -->
+            <ImageView
+                android:id="@+id/ivPreview"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginTop="12dp"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
+                android:visibility="gone"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 하단 우측 '익명' -->
+    <CheckBox
+        android:id="@+id/cbAnonymous"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="익명"
+        android:textColor="#0F6972"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
