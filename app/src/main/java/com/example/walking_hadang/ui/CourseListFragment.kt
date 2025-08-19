@@ -1,32 +1,19 @@
 package com.example.walking_hadang.ui
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.walking_hadang.BuildConfig
 import com.example.walking_hadang.adapter.AssetCourseCardAdapter
 import com.example.walking_hadang.adapter.CourseCardAdapter
 import com.example.walking_hadang.data.AssetCourseData
-import com.example.walking_hadang.data.CourseData
-import com.example.walking_hadang.data.CourseResponse
-import com.example.walking_hadang.data.CourseRetrofit
 import com.example.walking_hadang.data.CourseWrapper
 import com.example.walking_hadang.databinding.FragmentCourseListBinding
 import com.example.walking_hadang.util.LocationUtil
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class CourseListFragment : Fragment() {
     private var _binding: FragmentCourseListBinding? = null
@@ -51,7 +38,8 @@ class CourseListFragment : Fragment() {
         val tempList = LocationUtil.filterCoursesWithinRadius(loadCoursesFromAsset(), 37.5665, 126.9780)
 
         if (fragmentName.equals("HomeFragment")){
-            homeCourseAdapter = CourseCardAdapter(emptyList())
+
+            homeCourseAdapter = CourseCardAdapter(emptyList(), parentFragment?.parentFragmentManager)
             recyclerView.adapter = homeCourseAdapter
             homeCourseAdapter.updateData(tempList)
         }else{

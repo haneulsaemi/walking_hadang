@@ -14,30 +14,43 @@
         android:orientation="vertical">
 
         <!-- [1] 입력 카드 -->
+        <TextView
+            android:id="@+id/tvGlucoseTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="• 혈당 기록하기"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
+            android:includeFontPadding="false"/>
+
+        <!-- 입력 카드: 2번과 동일 톤 -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardGlucoseInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="12dp"
-            app:cardBackgroundColor="#FFF5DF"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
+            app:cardCornerRadius="14dp"
+            app:strokeWidth="1dp"
             app:strokeColor="#F0E6C8"
-            app:strokeWidth="1dp">
+            app:cardBackgroundColor="@android:color/white">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="right"
                 android:padding="12dp">
 
+                <!-- (옵션) 스위치 행: 동일 톤, 기본 숨김 -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    android:layout_gravity="end"
+                    android:gravity="center_vertical">
 
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/swRange"
@@ -48,10 +61,11 @@
                         android:id="@+id/tvSwitchLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="오늘" />
+                        android:text="오늘"
+                        android:layout_marginStart="6dp"/>
                 </LinearLayout>
 
-
+                <!-- 시간대/상황 선택 칩 -->
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chipTimeGroup"
                     android:layout_width="match_parent"
@@ -60,92 +74,117 @@
                     app:selectionRequired="true">
 
                     <com.google.android.material.chip.Chip
-                        style="@style/Record_Chip"
                         android:id="@+id/chipFasting"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="공복 혈당"
                         android:checkable="true"
-                        android:text="공복 혈당" />
+                        style="@style/Widget.MaterialComponents.Chip.Choice"/>
 
                     <com.google.android.material.chip.Chip
-                        style="@style/Record_Chip"
                         android:id="@+id/chipPost2h"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="식후 2시간"
                         android:checkable="true"
-                        android:text="식후 2시간" />
+                        style="@style/Widget.MaterialComponents.Chip.Choice"/>
 
                     <com.google.android.material.chip.Chip
-                        style="@style/Record_Chip"
                         android:id="@+id/chipBeforeBed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="취침 전"
                         android:checkable="true"
-                        android:text="취침 전" />
+                        style="@style/Widget.MaterialComponents.Chip.Choice"/>
 
                     <com.google.android.material.chip.Chip
-                        style="@style/Record_Chip"
                         android:id="@+id/chipEtc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="기타"
                         android:checkable="true"
-                        android:text="기타" />
+                        style="@style/Widget.MaterialComponents.Chip.Choice"/>
                 </com.google.android.material.chip.ChipGroup>
 
-                <Space android:layout_width="1dp" android:layout_height="8dp"/>
-
+                <!-- (옵션) 끼니 세부 선택 -->
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chipMealGroup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:singleSelection="true"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    android:layout_marginTop="6dp">
 
                     <com.google.android.material.chip.Chip
-                        style="@style/Record_Chip_Secondary"
                         android:id="@+id/chipBreakfast"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="아침"
                         android:checkable="true"
-                        android:text="아침" />
+                        style="@style/Widget.MaterialComponents.Chip.Choice"/>
 
                     <com.google.android.material.chip.Chip
-                        style="@style/Record_Chip_Secondary"
                         android:id="@+id/chipLunch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="점심"
                         android:checkable="true"
-                        android:text="점심" />
+                        style="@style/Widget.MaterialComponents.Chip.Choice"/>
 
                     <com.google.android.material.chip.Chip
-                        style="@style/Record_Chip_Secondary"
                         android:id="@+id/chipDinner"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="저녁"
                         android:checkable="true"
-                        android:text="저녁" />
+                        style="@style/Widget.MaterialComponents.Chip.Choice"/>
                 </com.google.android.material.chip.ChipGroup>
 
-                <Space android:layout_width="1dp" android:layout_height="12dp"/>
+                <!-- 구분선 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#EFEFEF"
+                    android:layout_marginVertical="6dp"/>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilGlucose"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <!-- 입력 행: 레이블 + OutlinedBox.Dense -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="혈당 기록하기"
-                    app:suffixText="mg/dL"
-                    app:boxStrokeColor="#E5D9B8"
-                    app:boxBackgroundColor="@android:color/transparent">
+                    android:gravity="center_vertical">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etGlucose"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="76dp"
                         android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:maxLines="1"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:text="혈당"
+                        android:textSize="14sp"
+                        android:includeFontPadding="false"/>
 
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilGlucose"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="혈당 기록하기"
+                        app:suffixText="mg/dL"
+                        app:boxStrokeColor="#D9D9D9"
+                        app:boxStrokeWidth="1dp"
+                        app:boxStrokeWidthFocused="2dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etGlucose"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:paddingVertical="6dp"
+                            android:inputType="number"
+                            android:maxLines="1"
+                            android:textSize="14sp"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <!-- 우측 힌트 -->
                 <TextView
                     android:id="@+id/tvHint"
                     android:layout_width="wrap_content"
@@ -156,13 +195,12 @@
                     android:layout_gravity="end"
                     android:layout_marginTop="6dp"/>
 
-                <Space android:layout_width="1dp" android:layout_height="8dp"/>
-
+                <!-- 추가하기 버튼: 2번과 동일 스타일 -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddGlucose"
-                    style="@style/Widget.MaterialComponents.Button"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
                     android:text="추가하기"
                     app:cornerRadius="24dp"
                     app:icon="@drawable/ic_add"

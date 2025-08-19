@@ -61,13 +61,7 @@ class HomeFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
-        binding.qaSleep.setOnClickListener {
-            val fragment = RecodingFragment.newInstance(1) // 0: 혈당, 1: 식사, 2: 산책
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.main_fragment_container, fragment)
-                .addToBackStack(null)
-                .commit()
-        }
+
         binding.qaNote.setOnClickListener {
             val fragment = RecodingFragment.newInstance(0) // 0: 혈당, 1: 식사, 2: 산책
             requireActivity().supportFragmentManager.beginTransaction()

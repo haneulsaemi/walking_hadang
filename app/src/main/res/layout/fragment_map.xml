@@ -28,7 +28,20 @@
             android:layout_height="match_parent"
             android:focusable="false"
             android:visibility="gone"
-            android:layout_gravity="top|start"/>
+            android:layout_gravity="top|start">
+            <!-- 재검색 버튼 -->
+            <Button
+                android:id="@+id/btnRescan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="여기에서 재검색"
+                android:layout_margin="16dp"
+                android:backgroundTint="@color/app_bg"
+                android:textColor="@color/black"
+                android:elevation="6dp"
+                android:layout_gravity="top|center_horizontal" />
+
+        </FrameLayout>
     </FrameLayout>
     <Button
         android:id="@+id/btnStartWalking"

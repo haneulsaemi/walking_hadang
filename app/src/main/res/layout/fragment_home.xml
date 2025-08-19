@@ -139,46 +139,14 @@
             </com.google.android.material.card.MaterialCardView>
 
             <!-- 혈당 그래프 -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardGraph"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:cardCornerRadius="20dp"
-                app:contentPadding="16dp"
-                app:cardBackgroundColor="@android:color/white">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="오늘의 혈당 그래프"
-                        android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-                        android:textColor="@color/ink_primary"/>
-
-                    <ImageView
-                        android:id="@+id/imgGraphPlaceholder"
-                        android:layout_width="match_parent"
-                        android:layout_height="160dp"
-                        android:layout_marginTop="8dp"
-                        android:contentDescription="그래프"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/illustration_graph_placeholder"
-                        tools:ignore="ContentDescription"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
             <!-- 빠른 기록: 캘린더 아래 풀폭 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="2"
-                android:layout_marginTop="8dp">
+                android:weightSum="3"
+                android:layout_marginTop="20dp">
 
                 <!-- 식사 -->
                 <LinearLayout
@@ -203,13 +171,10 @@
                         android:text="식사"
                         android:textSize="12sp"/>
                 </LinearLayout>
-
-                <!-- 세로 구분선 -->
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
                     android:background="#E6E6E6"/>
-
                 <!-- 운동 -->
                 <LinearLayout
                     android:id="@+id/qa_exercise"
@@ -230,56 +195,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="운동"
+                        android:text="산책"
                         android:textSize="12sp"/>
                 </LinearLayout>
-            </LinearLayout>
-
-            <!-- 가로 구분선 -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E6E6E6"
-                android:layout_marginVertical="4dp"/>
-
-            <!-- 2행 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2">
-
-                <!-- 수면 -->
-                <LinearLayout
-                    android:id="@+id/qa_sleep"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:background="?attr/selectableItemBackground">
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        app:srcCompat="@drawable/ic_sleep"
-                        app:tint="@color/ink_primary" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="수면"
-                        android:textSize="12sp"/>
-                </LinearLayout>
-
-                <!-- 세로 구분선 -->
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
                     android:background="#E6E6E6"/>
-
-                <!-- 비고 -->
+                <!-- 혈당 -->
                 <LinearLayout
                     android:id="@+id/qa_note"
                     android:layout_width="0dp"
@@ -299,10 +222,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="비고"
+                        android:text="혈당"
                         android:textSize="12sp"/>
                 </LinearLayout>
             </LinearLayout>
+
 
 
 

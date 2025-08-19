@@ -1,10 +1,13 @@
 package com.example.walking_hadang.data
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
 data class CourseWrapper(
     val records: List<AssetCourseData>
 )
+@Parcelize
 data class AssetCourseData(
     @SerializedName("길명") val name: String?,
     @SerializedName("길소개") val description: String?,
@@ -24,4 +27,4 @@ data class AssetCourseData(
     @SerializedName("제공기관명") val orgName: String?,
     @SerializedName("latitude") val latitude: String?,
     @SerializedName("longitude") val longitude: String?
-)
+): Parcelable

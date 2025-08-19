@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="160dp"
-    android:layout_height="wrap_content"
+    android:layout_height="280dp"
     android:layout_margin="8dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
@@ -47,14 +47,8 @@
             android:id="@+id/btnGoto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="찾아가기"
+            android:text="지도에서 확인"
             android:backgroundTint="#94BEC1"/>
-        <Button
-            android:id="@+id/btnDetail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="상세 정보"
-            android:backgroundTint="#529598"/>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

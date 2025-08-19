@@ -77,28 +77,36 @@
 
             <TextView
                 android:id="@+id/tvBand1"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="start"
                 android:text="정상"
                 android:textSize="12sp"
                 android:textColor="#777" />
 
             <TextView
                 android:id="@+id/tvBand2"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="당뇨 전단계"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="전단계"
                 android:textSize="12sp"
                 android:textColor="#777" />
 
             <TextView
                 android:id="@+id/tvBand3"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
                 android:text="당뇨"
                 android:textSize="12sp"
                 android:textColor="#777" />
         </LinearLayout>
+
+
 
         <!-- 구간 수치표시(선택) -->
         <TextView
