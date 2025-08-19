@@ -1,4 +1,4 @@
-package com.example.walking_hadang.ui
+package com.example.walking_hadang.ui.community
 
 import android.os.Bundle
 import android.view.LayoutInflater
