@@ -21,6 +21,16 @@ object GlucoseRepository {
 
     private fun uid(): String = MyApplication.auth.currentUser?.uid
         ?: throw IllegalStateException("로그인 필요")
+    private fun mealsColl() =
+        MyApplication.db.collection("users")
+            .document(GlucoseRepository.uid())
+            .collection("glucose")
+
+    private fun dayDoc(dateKey: String) =
+        mealsColl().document(dateKey)
+
+    private fun entriesColl(dateKey: String) =
+        dayDoc(dateKey).collection("glucoseEntries")
 
     fun addGlucoseEntry(
         raw: GlucoseData,
@@ -151,6 +161,14 @@ object GlucoseRepository {
         cal.add(Calendar.DAY_OF_MONTH, 7)
         val endExclusive = cal.time
         return start to endExclusive
+    }
+
+    suspend fun deleteGlucoseEntry(
+        dateKey: String,
+        entryId: String
+    ){
+        val docRef = entriesColl(dateKey).document(entryId)
+        docRef.delete().await()
     }
 
 

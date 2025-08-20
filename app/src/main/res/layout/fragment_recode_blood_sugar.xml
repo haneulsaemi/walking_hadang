@@ -242,7 +242,7 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:paddingStart="12dp"
-                        android:text="이번 주 공복 혈당 그래프"
+                        android:text="이번 주 혈당 그래프"
                         android:textColor="@android:color/white"
                         android:textStyle="bold"
                         />

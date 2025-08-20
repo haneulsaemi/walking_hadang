@@ -540,7 +540,7 @@ class RecodeBloodSugarFragment : Fragment() {
         binding.rvGlucose.layoutManager = LinearLayoutManager(requireContext())
         glucoseAdapter = GlucoseTodayAdapter(onDelete = { item ->
             // 삭제 로직(선택): GlucoseRepository.delete(item) 등
-            Toast.makeText(requireContext(), "삭제 준비: ${item.id}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "현재는 혈당 기록 삭제를 할 수 없습니다.. ", Toast.LENGTH_SHORT).show()
         })
         binding.rvGlucose.adapter = glucoseAdapter
     }
